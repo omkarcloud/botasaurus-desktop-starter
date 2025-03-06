@@ -1,0 +1,237 @@
+{
+  "name": "todo-my-app-name",
+  "productName": "Todo My App Name",
+  "description": "Todo my app description",
+  "author": "Todo My Organization Name <todo-my-email@gmail.com>",
+  "license": "MIT",
+  "main": "./.erb/dll/main.bundle.dev.js",
+  "scripts": {
+    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "build:dll": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
+    "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
+    "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
+    "postinstall": "npm run fix:header-generator && npm run fix:nedb && npm run fix:playwright && ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && npm run build:dll",
+    "package": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build -c.mac.identity=null --publish never && npm run build:dll",
+    "package:mac-signed": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
+    "package:publish": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish always && npm run build:dll",
+    "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
+    "prestart": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.dev.ts",
+    "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
+    "dev": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
+    "fix:playwright": "rimraf --glob ./node_modules/playwright-core/lib/vite/recorder/assets/*.css ./node_modules/playwright-core/lib/vite/recorder/assets/*.ttf node_modules/playwright-core/lib/vite/recorder/index.html node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg node_modules/playwright-core/lib/server/chromium/appIcon.png && ts-node  ./.erb/scripts/fix-playwright.js",
+    "fix:nedb": "ts-node  ./.erb/scripts/fix-nedb.js",
+    "fix:header-generator": "ts-node  ./.erb/scripts/fix-header-generator.js",
+    "build:main-dev": "webpack --config ./.erb/configs/webpack.config.main.dev.ts",
+    "clean": "rm -rf dist/ .webpack out/ node_modules/ package-lock.json yarn.lock && npm install",
+    "clean:db": "rimraf output/ error_logs/ task_results/ db.nedb",
+    "update": "npm update botasaurus botasaurus-controls botasaurus-server",
+    "start:main": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon .\"",
+    "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
+    "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
+    "test": "nodemon --watch src --watch test --ext ts,tsx,json --exec \"webpack --config ./.erb/configs/webpack.config.test.dev.ts && node .erb/dll/test.bundle.dev.js\""
+  },
+  "browserslist": [
+    "last 1 electron version"
+  ],
+  "prettier": {
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": [
+          ".prettierrc",
+          ".eslintrc"
+        ],
+        "options": {
+          "parser": "json"
+        }
+      }
+    ]
+  },
+  "dependencies": {
+    "@elastic/datemath": "latest",
+    "@elastic/eui": "latest",
+    "@emotion/css": "latest",
+    "@emotion/react": "latest",
+    "botasaurus": "latest",
+    "botasaurus-controls": "latest",
+    "botasaurus-server": "latest",
+    "change-case": "^5.4.4",
+    "chrome-launcher": "^1.1.2",
+    "cogo-toast-react-17-fix": "latest",
+    "electron-debug": "^3.2.0",
+    "electron-log": "^5.3.1",
+    "electron-updater": "^6.3.9",
+    "got-scraping": "^4.0.6",
+    "lodash.debounce": "^4.0.8",
+    "moment": "latest",
+    "playwright-core": "^1.47.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0",
+    "react-router-dom": "^6.16.0"
+  },
+  "devDependencies": {
+    "@electron/notarize": "^2.5.0",
+    "@electron/rebuild": "^3.7.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+    "@svgr/webpack": "^8.1.0",
+    "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
+    "@types/node": "20.6.2",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-helmet": "latest",
+    "@types/react-router-dom": "latest",
+    "@types/react-test-renderer": "^18.0.1",
+    "@types/webpack-bundle-analyzer": "^4.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "autoprefixer": "^10.4.20",
+    "chalk": "^4.1.2",
+    "concurrently": "^8.2.1",
+    "copy-webpack-plugin": "^12.0.2",
+    "core-js": "^3.32.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^5.0.1",
+    "detect-port": "^1.5.1",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8",
+    "electronmon": "^2.0.3",
+    "eslint": "^8.49.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-erb": "^4.1.0-0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-import-resolver-webpack": "^0.13.7",
+    "eslint-plugin-compat": "^4.2.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.3",
+    "identity-obj-proxy": "^3.0.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "nodemon": "^3.1.7",
+    "null-loader": "^4.0.1",
+    "postcss": "^8.4.47",
+    "postcss-loader": "^8.1.1",
+    "prettier": "^3.0.3",
+    "react-refresh": "^0.14.0",
+    "react-test-renderer": "^18.2.0",
+    "rimraf": "^6.0.1",
+    "sass": "^1.67.0",
+    "sass-loader": "^13.3.2",
+    "style-loader": "^3.3.3",
+    "tailwindcss": "^3.4.12",
+    "terser-webpack-plugin": "^5.3.9",
+    "ts-loader": "^9.4.4",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.2.2",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.88.2",
+    "webpack-bundle-analyzer": "^4.9.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.9.0"
+  },
+  "build": {
+    "productName": "Todo My App Name",
+    "appId": "com.todo-my-organization-name.todo-my-app-name",
+    "protocols": [
+      {
+        "name": "Todo My App Name",
+        "schemes": [
+          "todo-my-app-name"
+        ]
+      }
+    ],
+    "asar": true,
+    "asarUnpack": "**\\*.{node,dll}",
+    "files": [
+      "dist",
+      "node_modules",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "default",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "artifactName": "${productName}.${ext}",
+      "type": "distribution",
+      "hardenedRuntime": true,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "${productName}.${ext}"
+    },
+    "linux": {
+      "artifactName": "${productName}-${arch}.${ext}",
+      "maintainer": "Todo My Organization Name <todo-my-email@gmail.com>",
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "Development"
+    },
+    "directories": {
+      "app": "release/app",
+      "buildResources": "assets",
+      "output": "release/build"
+    },
+    "extraResources": [
+      "./assets/**"
+    ],
+    "publish": {
+      "provider": "s3",
+      "bucket": "todo-my-bucket-name"
+    }
+  },
+  "electronmon": {
+    "patterns": [
+      "!**/**",
+      "src/main/**",
+      "src/scraper/**",
+      ".erb/dll/**"
+    ],
+    "logLevel": "quiet"
+  }
+}

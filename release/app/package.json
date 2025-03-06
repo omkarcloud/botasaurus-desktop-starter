@@ -1,0 +1,13 @@
+{
+  "name": "todo-my-app-name",
+  "version": "1.0.0",
+  "description": "Todo my app description",
+  "license": "MIT",
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "postinstall": "npm run rebuild && npm run link-modules",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts"
+  },
+  "dependencies": {}
+}
