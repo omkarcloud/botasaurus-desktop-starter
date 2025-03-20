@@ -26,6 +26,7 @@ import TextField from '../inputs/TextField';
 import { useRouter } from '../Link';
 import ScraperSelector from '../ScraperSelector/ScraperSelector';
 import { Container } from '../Wrappers';
+import { useGoogleChromeRequiredModal } from '../useGoogleChromeRequiredModal'
 
 import DragDropFileUploader from '../inputs/DragDropFileUploader'
 
@@ -508,8 +509,11 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
           }
         }        
         } catch (error:any) {
-          throw error;
-        }
+          if (error.message && error.message.includes('GOOGLE_CHROME_REQUIRED')) {
+            showGoogleChromeRequiredModal()
+          } else {
+            throw error;
+          }        }
         } else {
         const rs = { ...accords }
 
@@ -525,6 +529,7 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
         setaccords(rs)
         }
         }
+        const { modal:googleChromeRequiredModal, showModal:showGoogleChromeRequiredModal } = useGoogleChromeRequiredModal()
       
 // @ts-ignore
 if (!controls.controls.length) {
@@ -534,6 +539,7 @@ return <EmptyInputs />
   const showCache = enable_cache === true
 return (
 <>
+{googleChromeRequiredModal}
 {scrapers.length <= 1 || typeof window === 'undefined' ? null : (
 <ScraperSelector
   scrapers={scrapers}
