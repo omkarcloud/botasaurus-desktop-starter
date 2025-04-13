@@ -28,7 +28,7 @@
     "start:main": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon .\"",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "nodemon --watch src --watch test --ext ts,tsx,json --exec \"webpack --config ./.erb/configs/webpack.config.test.dev.ts && node .erb/dll/test.bundle.dev.js\""
+    "test": "cross-env NODE_ENV=development nodemon --watch src --watch test --ext ts,tsx,json --exec 'webpack --config ./.erb/configs/webpack.config.test.dev.ts && node .erb/dll/test.bundle.dev.js'"
   },
   "browserslist": [
     "last 1 electron version"
