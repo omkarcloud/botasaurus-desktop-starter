@@ -12,15 +12,9 @@ const find = `        this.headersOrder = JSON.parse((0, fs_1.readFileSync)(\`\$
                 this.uniqueBrowsers.push(this.prepareHttpBrowserObject(browserString));
             }
         }
-        this.inputGeneratorNetwork = new generative_bayesian_network_1.BayesianNetwork({
-            path: \`\$\{__dirname}/data_files/input-network-definition.zip\`,
-        });
-        this.headerGeneratorNetwork = new generative_bayesian_network_1.BayesianNetwork({
-            path: \`\$\{__dirname}/data_files/header-network-definition.zip\`,
-        });`
-
-
-        const replacement = `
+        this.inputGeneratorNetwork = new generative_bayesian_network_1.BayesianNetwork({ path: \`\$\{__dirname}/data_files/input-network-definition.zip\` });
+        this.headerGeneratorNetwork = new generative_bayesian_network_1.BayesianNetwork({ path: \`\$\{__dirname}/data_files/header-network-definition.zip\` });`
+const replacement = `
         function isRunningInErbDll() {
             const currentDir = __dirname;
             const dirName = path.basename(currentDir);
@@ -72,6 +66,7 @@ function replaceAppWithSrc() {
     try {
         // Read the file synchronously
         let content = fs.readFileSync(filePath, 'utf8');
+
         // Replace the specified content
         content = content.replace(find, replacement)
         if (!content.includes(`const path = require('path');`)) {

@@ -22,7 +22,7 @@
     "fix:nedb": "ts-node  ./.erb/scripts/fix-nedb.js",
     "fix:header-generator": "ts-node  ./.erb/scripts/fix-header-generator.js",
     "build:main-dev": "webpack --config ./.erb/configs/webpack.config.main.dev.ts",
-    "clean": "rm -rf dist/ .webpack out/ node_modules/ package-lock.json yarn.lock && npm install",
+    "clean": "rm -rf dist/ .webpack out/ node_modules/ && npm install",
     "clean:db": "rimraf output/ error_logs/ task_results/ db.nedb",
     "update": "npm update botasaurus botasaurus-controls botasaurus-server",
     "start:main": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon .\"",

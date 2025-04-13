@@ -35,7 +35,7 @@ To run locally, follow these steps:
 
 1️⃣ Clone the Magic 🧙‍♀️:
    ```bash
-   git clone https://github.com/omkarcloud/botasaurus-starter my-botasaurus-desktop-app
+   git clone https://github.com/omkarcloud/botasaurus-desktop-starter my-botasaurus-desktop-app
    cd my-botasaurus-desktop-app
    ```
 
