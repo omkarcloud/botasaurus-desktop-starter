@@ -1,5 +1,5 @@
 import { EuiFilePicker } from '@elastic/eui/optimize/es/components/form/file_picker/file_picker';
-import { handler } from '../../utils/handler'
+import { getPathForFile } from '../../utils/electron'
 
 export default function DragDropFileUploader({ filePickerRef, onChange, multiple = true, acceptedFileTypes = [], ...props }) {
     const handleFileChange = (files) => {
@@ -8,7 +8,7 @@ export default function DragDropFileUploader({ filePickerRef, onChange, multiple
       const file = files[i];
       const item = {
         name: file.name,
-        path: handler.getPathForFile(file),
+        path: getPathForFile(file),
         size: file.size,
         last_modified: file.lastModified
       }

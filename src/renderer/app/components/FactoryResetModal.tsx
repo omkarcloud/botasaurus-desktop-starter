@@ -8,7 +8,7 @@ import { EuiModalHeader } from '@elastic/eui/optimize/es/components/modal/modal_
 import { EuiModalHeaderTitle } from '@elastic/eui/optimize/es/components/modal/modal_header_title';
 import { useEffect, useState } from 'react';
 import ClickOutside from './ClickOutside/ClickOutside';
-import { handler } from '../utils/handler';
+import { ipcRenderer } from '../utils/electron';
 
 export default function FactoryResetModal() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -19,9 +19,9 @@ export default function FactoryResetModal() {
 
   useEffect(() => {
     const showModal = () => setIsModalVisible(true);
-    handler.on('show-reset-prompt', showModal);
+    ipcRenderer.on('show-reset-prompt', showModal);
     return () => {
-      handler.off('show-reset-prompt', showModal);
+      ipcRenderer.off('show-reset-prompt', showModal);
     };
   }, []);
 
@@ -47,7 +47,7 @@ export default function FactoryResetModal() {
             <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
             <EuiButton
               onClick={() => {
-                handler.send('perform-reset');
+                ipcRenderer.send('perform-reset');
                 closeModal();
               }}
             >

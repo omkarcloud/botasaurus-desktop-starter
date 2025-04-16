@@ -8,7 +8,7 @@ import {
 import { removeSync } from 'botasaurus/utils';
 import { AppUpdater } from './utils/AppUpdater';
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage';
-import { MainHandler } from './utils/main-handler';
+import { ipcMain } from './utils/ipc-main';
 import { Server } from 'botasaurus-server/server';
 
 export function getSupportSubMenu(): MenuItemConstructorOptions[] {
@@ -58,8 +58,8 @@ export function getSupportSubMenu(): MenuItemConstructorOptions[] {
     {
       label: 'Factory Reset App and Clear All Data',
       click: () => {
-        MainHandler.send('show-reset-prompt');
-        MainHandler.once('perform-reset', performFactoryReset);
+        ipcMain.send('show-reset-prompt');
+        ipcMain.once('perform-reset', performFactoryReset);
       },
     },
   );

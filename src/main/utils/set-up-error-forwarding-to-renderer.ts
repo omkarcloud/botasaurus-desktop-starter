@@ -1,11 +1,11 @@
-import { MainHandler } from './main-handler';
+import { ipcMain } from './ipc-main';
 
 const sendErrorToRenderer = (error) => {
   const errorMessage = error instanceof Error ? error.message : String(error);
   const errorStack =
     error instanceof Error ? error.stack : 'No stack available';
 
-  MainHandler.log({
+  ipcMain.log({
     error: errorMessage,
     stack: errorStack,
     timestamp: new Date().toISOString(),

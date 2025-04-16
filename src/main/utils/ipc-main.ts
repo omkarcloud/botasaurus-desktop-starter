@@ -4,7 +4,7 @@ import { IpcRendererEvent } from 'electron'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { getWindow,  } from './window'
 
-const MainHandler = {
+const _ipcMain = {
     send: (channel: string, ...args: any[]) => {
         const window = getWindow()
         window?.webContents.send(channel, ...args)
@@ -23,7 +23,7 @@ const MainHandler = {
     log: (...args: any[]) => {
         // @ts-ignore
         try {
-            MainHandler.send("log", ...args)    
+            _ipcMain.send("log", ...args)    
         } catch (error:any) {
             // can't console error as it is modified in set-up-error-forwarding-to-renderer.ts
             console.log(error?.message)
@@ -34,4 +34,4 @@ const MainHandler = {
 
 }
 
-export { MainHandler }
+export { _ipcMain as ipcMain }

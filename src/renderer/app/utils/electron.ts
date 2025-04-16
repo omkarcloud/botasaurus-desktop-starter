@@ -10,12 +10,12 @@ type IpcHandler =  {
 }
 
 // @ts-ignore
-export const handler: IpcHandler = ipc
+export const ipcRenderer: IpcHandler = electron.ipcRenderer
+// @ts-ignore
+export const getPathForFile = electron.getPathForFile
 
-
-handler.on("log", console.log)
-
+ipcRenderer.on("log", console.log)
 
 for (const [key, value] of Object.entries(cogoToastRoute)) {
-    handler.on(key, value);
+    ipcRenderer.on(key, value);
 }

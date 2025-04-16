@@ -1,5 +1,5 @@
 import { autoUpdater } from 'electron-updater';
-import { MainHandler } from './main-handler'
+import { ipcMain } from './ipc-main'
 import { sleep } from 'botasaurus/utils';
 import { getOs } from 'botasaurus/env';
 
@@ -46,25 +46,25 @@ class _AppUpdater {
   async listenEvents(){
 
       // autoUpdater.on('checking-for-update', () => {
-      //   MainHandler.log('Checking for updates...');
+      //   ipcMain.log('Checking for updates...');
       // });
 
       autoUpdater.on('update-available', (info) => {
-        MainHandler.log('Update available:', info);
+        ipcMain.log('Update available:', info);
         // Only Download the Latest Version
         autoUpdater.downloadUpdate();
       });
 
       // autoUpdater.on('update-not-available', (info) => {
-      //   MainHandler.log('Update not available:', info);
+      //   ipcMain.log('Update not available:', info);
       // });
 
       autoUpdater.on('error', (err) => {
-        MainHandler.log('Error in auto-updater:', err);
+        ipcMain.log('Error in auto-updater:', err);
       });
 
       autoUpdater.on('update-downloaded', (info) => {
-        MainHandler.log('Update downloaded:', info);
+        ipcMain.log('Update downloaded:', info);
       });    
   }
 
@@ -76,7 +76,7 @@ class _AppUpdater {
     }
 
     try {
-      MainHandler.send('checkingForUpdates')
+      ipcMain.send('checkingForUpdates')
       const startTime = Date.now();
       const result = await autoUpdater.checkForUpdates();
       const elapsedTime = Date.now() - startTime;
@@ -85,21 +85,21 @@ class _AppUpdater {
         await sleep(2)
       }
       if (canUpdate(result)) {
-        MainHandler.send('downloadingUpdates')
+        ipcMain.send('downloadingUpdates')
         await autoUpdater.downloadUpdate(); // Start downloading the update
-        MainHandler.send('quittingToApplyUpdates')
+        ipcMain.send('quittingToApplyUpdates')
         // wait for 10 seconds
         await sleep(10)
-        MainHandler.send('hideAll')
+        ipcMain.send('hideAll')
   
         autoUpdater.quitAndInstall(false, true); // Quit and install the update
-        MainHandler.log('Updated')
+        ipcMain.log('Updated')
       } else {
-        MainHandler.send('success', getCurrentVersion())
+        ipcMain.send('success', getCurrentVersion())
       }
     } catch (error) {
       console.error(error)
-      MainHandler.send('hideAll')
+      ipcMain.send('hideAll')
     }
   }
 }

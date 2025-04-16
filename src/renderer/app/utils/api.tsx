@@ -1,4 +1,4 @@
-import { handler } from "./handler"
+import { ipcRenderer } from "./electron"
 import cogoToast from 'cogo-toast-react-17-fix'
 import Toast from './cogo-toast'
 import { apiConfig } from "./api-config"
@@ -19,9 +19,9 @@ async function fetch({ route, message, silent, silentOnError }: any, ...data) {
     }
     try {
         if (data.length == 1) {
-            result = await handler.invoke(route, data[0])
+            result = await ipcRenderer.invoke(route, data[0])
         }else {
-            result = await handler.invoke(route, ...data)
+            result = await ipcRenderer.invoke(route, ...data)
         }
     } catch (error) {
         if (hidefn) {
