@@ -55,7 +55,6 @@ const TextFieldWithLabel = ({ label, initialValue, onChange }) => {
   return (
     <EuiFormRow fullWidth label={label}>
       <SearchField
-        fullWidth
         onApply={handleChange}
         value={value}
         onChange={handleChange}

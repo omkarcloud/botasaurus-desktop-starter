@@ -14,6 +14,7 @@ export default function SearchField({
 
   return (
     <EuiFieldSearch
+      fullWidth
       placeholder="Search..."
       aria-label="Search field"
       {...props}

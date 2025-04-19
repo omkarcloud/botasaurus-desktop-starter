@@ -20,6 +20,7 @@ import InputMultiSelect from '../inputs/InputMultiSelect';
 import ListOfTextFields from '../inputs/ListOfTextFields';
 import NumberField from '../inputs/NumberField';
 import SingleSelect from '../inputs/SingleSelect';
+import SearchField from '../inputs/SearchField';
 import SwitchField from '../inputs/SwitchField';
 import TextAreaField from '../inputs/TextAreaField';
 import TextField from '../inputs/TextField';
@@ -134,7 +135,19 @@ const InputFields = ({
               />
             )
             break
-          case 'link':
+            case 'search':
+              inputElement = (
+                <SearchField
+                  title={disabledMsg}
+                  disabled={disabled}
+                  placeholder={(control as any).placeholder}
+                  name={id}
+                  value={data[id]}
+                  onChange={value => handleInputChange(id, value)}
+                />
+              )
+              break                      
+            case 'link':
             inputElement = (
               <TextField
                 title={disabledMsg}
