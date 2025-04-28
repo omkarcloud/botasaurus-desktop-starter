@@ -6,7 +6,30 @@ function incrementMinorVersion(version) {
   const newMinor = minor + 1;
   return `${major}.${newMinor}.${patch}`;
 }
+function updateVersionInFile(filePath, newVersion) {
+  if (!fs.existsSync(filePath)) {
+    console.log(`File not found: ${filePath}`);
+    return false;
+  }
 
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+  if ('version' in data) {
+    data.version = newVersion;
+  }
+
+  if ('packages' in data && typeof data.packages === 'object') {
+    for (const packageKey in data.packages) {
+      const packageData = data.packages[packageKey];
+      if (packageData && 'version' in packageData) {
+        packageData.version = newVersion;
+      }
+    }
+  }
+
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  return true;
+}
 function main() {
   const packageJsonPath = './release/app/package.json';
 
@@ -36,6 +59,14 @@ function main() {
   } else {
     console.log(`Version incremented from ${data.version} to ${newVersion}`);
   }
+  const packageLockJsonPath = './release/app/package-lock.json';
+
+  if (updateVersionInFile(packageLockJsonPath, newVersion)) {
+    
+  } else {
+    console.log(`Failed to update package-lock.json`);
+  }
+
 }
 
 main();
