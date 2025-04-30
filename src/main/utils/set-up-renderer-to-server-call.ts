@@ -17,7 +17,6 @@ export function setUpRendererToServerCall() {
     ipcMain.handle(key, async (_, ...data) => {
       // @ts-ignore
       const result = await value(...data);
-      // writeTempJson(result)
       return result;
     });
   }
