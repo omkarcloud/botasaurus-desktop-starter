@@ -92,7 +92,7 @@ export function getApiArgs() {
           console.error(port)
         }
       }
-    } else if (args[i] === '--only-run-api') {
+    } else if (args[i] === '--only-start-api') {
       hasServerArguments = true
       onlyRunApi = true
     }

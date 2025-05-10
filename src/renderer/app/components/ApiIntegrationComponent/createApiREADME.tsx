@@ -118,7 +118,7 @@ const asyncTasks = await api.createAsyncTasks({ ${x}dataItems })
 const syncTasks = await api.createSyncTasks({ ${x}dataItems })
 \`\`\`
 
-Also, ${maxRunsMessage}.
+Also, ${maxRunsMessage}
 `
 }
 function createScraperTaskDataText(scraperName: string, hasSingleScraper: boolean): string {
@@ -318,7 +318,6 @@ const api = ${baseUrl ? `new Api({
 ### Creating Tasks
 
 There are two types of tasks:
-
 - Asynchronous Task
 - Synchronous Task
 
@@ -396,16 +395,16 @@ const result = await api.get('${route_path}', ${jsObjectToJsObjectString(default
 
 \`\`\`
 This will:
-* Make a **GET** request to the \`/${route_path}\` endpoint.
-* Bypass task creation, scheduling, and running overhead.
-* Validate the input data before execution.
-* Cache the results based on the provided parameters.
-* ${maxRunsMessage2}
+- Make a **GET** request to the \`/${route_path}\` endpoint.
+- Bypass task creation, scheduling, and running overhead.
+- Validate the input data before execution.
+- Cache the results based on the provided parameters.
+- ${maxRunsMessage2}
 
 This method is especially useful when:
 
-* You simply want to call the scraper and get the result.
-* You plan to resell the API via platforms like **RapidAPI**, where the task abstraction is unnecessary.
+- You simply want to call the scraper and get the result.
+- You plan to resell the API via platforms like **RapidAPI**, where the task abstraction is unnecessary.
 
 ## Examples
 
