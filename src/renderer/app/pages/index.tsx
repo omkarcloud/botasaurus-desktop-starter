@@ -8,14 +8,14 @@ import Api from '../utils/api'
 
 // Create a Container Component adds padding
 function Page() {
-  const props = Api.getApiConfig()
+  const props = Api.getAppProps()
   return (
     <>
-      <Seo {...props} title={'Home'} />
+      <Seo title={'Home'} />
       <AuthedDashboard {...props}>
         <Container>
           <Description {...props} />
-          <Tabs initialSelectedTab={TabsId.INPUT} />
+          <Tabs showApiIntegrationTab={props.show_api_integration_tab} initialSelectedTab={TabsId.INPUT} />
           <TabWrapper>
             <InputComponent {...props} />
           </TabWrapper>

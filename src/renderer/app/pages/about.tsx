@@ -7,17 +7,17 @@ import { Container, TabWrapper } from '../components/Wrappers'
 import Api from '../utils/api'
 
 const Page = () => {
-  const props = Api.getApiConfig()
+  const props = Api.getAppProps()
   const markdownContent = props.readme
 
   return (
     <>
-      <Seo {...props} title={'About'} />
+      <Seo title={'About'} />
 
       <AuthedDashboard {...props}>
         <Container>
           <Description {...props} />
-          <Tabs initialSelectedTab={TabsId.ABOUT} />
+          <Tabs showApiIntegrationTab={props.show_api_integration_tab} initialSelectedTab={TabsId.ABOUT} />
           <TabWrapper>
             <AboutComponent markdownContent={markdownContent} />
           </TabWrapper>

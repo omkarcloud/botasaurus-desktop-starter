@@ -7,7 +7,7 @@ import { PageHoc } from '../../components/PageHoc'
 const Page = ({ tasks, ...props }: any) => {
   return (
     <>
-      <Seo {...props} title={'Output'} />
+      <Seo title={'Output'} />
 
       <AuthedDashboard {...props}>
       <OutputComponent {...props} tasks={tasks} />

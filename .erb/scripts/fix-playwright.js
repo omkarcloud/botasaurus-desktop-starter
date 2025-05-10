@@ -24,7 +24,7 @@ var bidiCdpConnection =  null;
 `
 
 function replaceAppWithSrc() {
-    const dirPath = path.join('.', 'node_modules', 'playwright-core');
+    const dirPath = path.join('.', 'node_modules', 'rebrowser-playwright-core');
     ;
 
     if (!fs.existsSync(dirPath)) {
@@ -37,7 +37,7 @@ function replaceAppWithSrc() {
         
         modifyContentAndWriteToFile(path.join(dirPath, 'lib', 'server', 'launchApp.js'), find, replacement)
         modifyContentAndWriteToFile(path.join(dirPath, 'lib', 'server', 'bidi','bidiOverCdp.js'), find1, replacement1)
-        // node_modules/playwright-core/lib/server/bidi/bidiOverCdp.js
+        // node_modules/rebrowser-playwright-core/lib/server/bidi/bidiOverCdp.js
         // .replace(find1, replacement1);
 
         console.log('Successfully replaced');

@@ -18,7 +18,7 @@
     "prestart": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.dev.ts",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
     "dev": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
-    "fix:playwright": "rimraf --glob ./node_modules/playwright-core/lib/vite/recorder/assets/*.css ./node_modules/playwright-core/lib/vite/recorder/assets/*.ttf node_modules/playwright-core/lib/vite/recorder/index.html node_modules/playwright-core/lib/vite/recorder/playwright-logo.svg node_modules/playwright-core/lib/server/chromium/appIcon.png && ts-node  ./.erb/scripts/fix-playwright.js",
+    "fix:playwright": "rimraf --glob ./node_modules/rebrowser-playwright-core/lib/vite/recorder/assets/*.css ./node_modules/rebrowser-playwright-core/lib/vite/recorder/assets/*.ttf node_modules/rebrowser-playwright-core/lib/vite/recorder/index.html node_modules/rebrowser-playwright-core/lib/vite/recorder/playwright-logo.svg node_modules/rebrowser-playwright-core/lib/server/chromium/appIcon.png && ts-node  ./.erb/scripts/fix-playwright.js",
     "fix:nedb": "ts-node  ./.erb/scripts/fix-nedb.js",
     "fix:header-generator": "ts-node  ./.erb/scripts/fix-header-generator.js",
     "build:main-dev": "webpack --config ./.erb/configs/webpack.config.main.dev.ts",
@@ -64,11 +64,11 @@
     "got-scraping": "^4.0.6",
     "lodash.debounce": "^4.0.8",
     "moment": "latest",
-    "playwright-core": "^1.47.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^6.16.0"
+    "react-router-dom": "^6.16.0",
+    "rebrowser-playwright-core": "^1.49.1"
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",

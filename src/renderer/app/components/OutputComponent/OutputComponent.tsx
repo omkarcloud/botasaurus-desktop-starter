@@ -375,11 +375,11 @@ const OutputComponent = (props) => {
   return <> <OutputTabsContainer>
     <ServerStatusComponent />
     <Description {...props} />
-    <Tabs onTabChange={(id) => {
+    <Tabs showApiIntegrationTab={props.show_api_integration_tab} onTabChange={((id) => {
       if (id === TabsId.OUTPUT) {
         onPageChange(1)
       }
-    }} initialSelectedTab={TabsId.OUTPUT} />
+    }) as any } initialSelectedTab={TabsId.OUTPUT} />
   </OutputTabsContainer>
     <OutputContainer>
       <TabWrapper>

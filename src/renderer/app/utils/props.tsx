@@ -2,7 +2,7 @@ import Api from './api'
 
 export const outputServerSideProps = async () => {
     const tasks = await Api.getTasksForUiDisplay()
-    return { ...Api.getApiConfig(), tasks: tasks.data }
+    return { ...Api.getAppProps(), tasks: tasks.data }
 }
 
 export const outputTaskServerSideProps = async ({
@@ -15,5 +15,5 @@ export const outputTaskServerSideProps = async ({
         "page": 1,
     }, true)
 
-    return  {...Api.getApiConfig(),  response: data, taskId: id }
+    return  {...Api.getAppProps(),  response: data, taskId: id }
 }

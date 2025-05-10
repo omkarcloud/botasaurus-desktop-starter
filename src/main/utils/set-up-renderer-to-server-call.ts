@@ -1,5 +1,4 @@
 import { shell } from 'electron';
-import run from 'botasaurus-server/run';
 import { ipcMain } from './ipc-main';
 import * as routes from 'botasaurus-server/task-routes';
 import setUpErrorForwardingToRenderer from './set-up-error-forwarding-to-renderer';
@@ -28,6 +27,4 @@ export function setUpRendererToServerCall() {
     // @ts-ignore
     return shell.openExternal(...data);
   });
-
-  run();
 }

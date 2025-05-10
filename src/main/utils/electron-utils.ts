@@ -69,3 +69,58 @@ function getResourcesPath(): string {
 export const getAssetPath = (...paths: string[]): string => {
 return path.join(getResourcesPath(), ...paths);
 };
+
+export function getApiArgs() {
+  const args = process.argv
+
+  // Parse arguments
+  let port:number = null  as any// default
+  let onlyRunApi = false
+  let hasServerArguments = false
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--port' ) {
+      hasServerArguments = true
+      if (i + 1 < args.length) {
+        try {
+          port = parseInt(args[i + 1])  
+          if (port > 1){
+            i++
+          }
+          
+        } catch (error) {
+          console.error(port)
+        }
+      }
+    } else if (args[i] === '--only-run-api') {
+      hasServerArguments = true
+      onlyRunApi = true
+    }
+  }
+  return { port, onlyRunApi, hasServerArguments }
+}
+
+
+/**
+ * Checks if the API configuration is available globally.
+ * @returns {boolean} - Returns true if `global.ApiConfig` exists, otherwise false.
+ */
+export function hasAPI(): boolean {
+  // @ts-ignore
+  return  global.ApiConfig !== undefined;
+}
+
+
+export function getAPI(): any {
+  // @ts-ignore
+  return  global.ApiConfig;
+}
+export function startServer(...args: any[]): any {
+  // @ts-ignore
+  return global.startServer(...args);
+}
+
+export function stopServer(): any {
+  // @ts-ignore
+  return  global.stopServer();
+}

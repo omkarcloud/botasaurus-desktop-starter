@@ -97,13 +97,14 @@ function createApiTaskText(scraperName: string, hasSingleScraper: boolean, defau
 
 \`\`\`javascript
 const data = ${jsObjectToJsObjectString(defaultData)}
-const task = await api.createAsyncTask({ ${x}data })
+const asyncTask = await api.createAsyncTask({ ${x}data })
 \`\`\`
 
 To create a synchronous task, use the \`createSyncTask\` method:
 
 \`\`\`javascript
-const task = await api.createSyncTask({ ${x}data })
+const syncTask = await api.createSyncTask({ ${x}data })
+
 \`\`\`
 
 You can create multiple asynchronous or synchronous tasks at once using the \`createAsyncTasks\` and \`createSyncTasks\` methods, respectively:
@@ -255,12 +256,21 @@ export function createApiREADME(
   filters: any[],
   views: any[],
   defaultSort: string,
+  route_path:string,
   max_runs: number | null): string {
-  const maxRunsMessage = max_runs === null
+    const maxRunsMessage = max_runs === null
     ? "This scraper supports unlimited concurrent tasks."
     : max_runs === 1
-      ? "You can run only **1** task of this scraper at a time."
+      ? "You can run only **1** task of this scraper concurrently."
       : `You can run up to **${max_runs}** tasks of this scraper concurrently.`
+
+      
+      
+    const maxRunsMessage2 = max_runs === null
+    ? "Allow unlimited concurrent runs of this scraper."
+    : max_runs === 1
+      ? "Allow only **1** concurrent run of this scraper."
+      : `Allow up to **${max_runs}** concurrent runs of this scraper.`
 
   return `# API Integration
 
@@ -302,6 +312,7 @@ const api = ${baseUrl ? `new Api({
   apiUrl: '${baseUrl}',
   createResponseFiles: false,
 })` : "new Api({ createResponseFiles: false })"}
+
 \`\`\`
 
 ### Creating Tasks
@@ -325,6 +336,7 @@ To fetch tasks from the server, use the \`getTasks\` method:
 
 \`\`\`javascript
 const tasks = await api.getTasks()
+
 \`\`\`
 
 ${createFetchingTaskText(sorts, filters, views, defaultSort)}
@@ -333,6 +345,7 @@ To fetch a specific task by its ID, use the \`getTask\` method:
 
 \`\`\`javascript
 const task = await api.getTask(1)
+
 \`\`\`
 
 ### Fetching Task Results Only
@@ -341,6 +354,7 @@ To fetch only the results of a specific task, use the \`getTaskResults\` method:
 
 \`\`\`javascript
 const results = await api.getTaskResults({ taskId: 1 })
+
 \`\`\`
 
 ${createFetchingTaskResultsText(sorts, filters, views, defaultSort)}
@@ -355,12 +369,14 @@ To abort a specific task, use the \`abortTask\` method:
 
 \`\`\`javascript
 await api.abortTask(1)
+
 \`\`\`
 
 To delete a specific task, use the \`deleteTask\` method:
 
 \`\`\`javascript
 await api.deleteTask(1)
+
 \`\`\`
 
 You can also bulk abort or delete multiple tasks at once using the \`abortTasks\` and \`deleteTasks\` methods, respectively:
@@ -369,6 +385,27 @@ You can also bulk abort or delete multiple tasks at once using the \`abortTasks\
 await api.abortTasks({ taskIds: [1, 2, 3] })
 await api.deleteTasks({ taskIds: [4, 5, 6] })
 \`\`\`
+
+## Direct Call (Bypassing Task System)
+
+If you prefer a lightweight, immediate way to run the scraper without the overhead of creating, scheduling, and running tasks, you can make a direct \`GET\` request to the \`/${route_path}\` endpoint.
+
+
+\`\`\`javascript
+const result = await api.get('${route_path}', ${jsObjectToJsObjectString(defaultData)})
+
+\`\`\`
+This will:
+* Make a **GET** request to the \`/${route_path}\` endpoint.
+* Bypass task creation, scheduling, and running overhead.
+* Validate the input data before execution.
+* Cache the results based on the provided parameters.
+* ${maxRunsMessage2}
+
+This method is especially useful when:
+
+* You simply want to call the scraper and get the result.
+* You plan to resell the API via platforms like **RapidAPI**, where the task abstraction is unnecessary.
 
 ## Examples
 

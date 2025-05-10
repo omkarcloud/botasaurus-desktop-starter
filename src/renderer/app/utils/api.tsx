@@ -1,7 +1,7 @@
 import { ipcRenderer } from "./electron"
 import cogoToast from 'cogo-toast-react-17-fix'
 import Toast from './cogo-toast'
-import { apiConfig } from "./api-config"
+import { appProps } from "./app-props"
 
 async function fetch({ route, message, silent, silentOnError }: any, ...data) {
     silentOnError = silentOnError ?? false
@@ -43,8 +43,8 @@ async function fetch({ route, message, silent, silentOnError }: any, ...data) {
     return { data: result, status: 200 }
 }
 
-function getApiConfig() {
-    return apiConfig
+function getAppProps() {
+    return appProps
 
 }
 
@@ -111,7 +111,7 @@ function getUiTaskResults(taskId: number, data: any = {}, force_apply_first_view
 const Api = {
     openExternal, 
     openInFolder,
-    getApiConfig,
+    getAppProps,
     createAsyncTask,
     getApi,
     getTasksForUiDisplay,

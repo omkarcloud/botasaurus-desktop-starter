@@ -169,7 +169,7 @@ function stripChars(input) {
   return result;
 }
 
-function parseStringToList(input) {
+function parseStringToList(input: string) {
   input = input.trim();
 
   // Handle empty string
@@ -184,7 +184,13 @@ function parseStringToList(input) {
         return jsonList.map(x=>`${x}`.trim())
       }
   } catch (e) {
-    return input.split(/[\n,]+/).map(s => stripChars(s.trim()).trim());
+    const split = input.split(/[\n]+/)
+    const lines = split.map(s => stripChars(s.trim()).trim()).filter(isNotEmpty)
+    if (lines.length === 1) {
+      return lines[0].split(/[,]+/).map((s: string) => stripChars(s.trim()).trim()).filter(isNotEmpty)
+    } else {
+      return lines;
+    }
   }
 }
 
@@ -245,11 +251,8 @@ function Modal({ closeModal, id, value, onChangeValue, islinks }) {
             let x = parseStringToList(modaltext)
             
             if (islinks){
-              x = x.filter(isNotEmpty).map(getLink).filter(x=>x!== null).map(x=>x.trim())
-            } else {
-              x = x.filter(isNotEmpty).map(x=>x.trim())
+              x = x.map(getLink).filter(x=>x!== null)
             }
-            
             onChangeValue(x)
             closeModal()
           } }>

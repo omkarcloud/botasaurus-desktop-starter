@@ -8,15 +8,27 @@ export const TabsId = {
   INPUT: 'input',
   OUTPUT: 'output',
   ABOUT: 'about',
+  API_INTEGRATION: 'api-integration',
 }
 
 const tabs = [
   { route: '/', id: TabsId.INPUT, name: 'Input', content: <></> },
   { route: '/output', id: TabsId.OUTPUT, name: 'Output', content: <></> },
   { route: '/about', id: TabsId.ABOUT, name: 'About', content: <></> },
-
+  
 ]
-const PagesTabs = ({ initialSelectedTab, onTabChange = null }:any) => {
+
+
+const tabsWithApi =tabs.concat(
+  {
+    route: '/api-integration',
+    id: TabsId.API_INTEGRATION,
+    name: 'API Integration',
+    content: <></>,
+  })
+
+
+const PagesTabs = ({ initialSelectedTab,showApiIntegrationTab, onTabChange = null }) => {
   const [selectedTabId, setSelectedTabId] = useState(initialSelectedTab)
   const router = useRouter()
 
@@ -28,6 +40,7 @@ const PagesTabs = ({ initialSelectedTab, onTabChange = null }:any) => {
     setSelectedTabId(tab.id)
     pushToRoute(router, tab.route)
     if (onTabChange) {
+      // @ts-ignore
       onTabChange(tab.id)
     }
   }
@@ -35,7 +48,7 @@ const PagesTabs = ({ initialSelectedTab, onTabChange = null }:any) => {
   return (
     <Tabs
       className="mt-2"
-      tabs={tabs}
+      tabs={showApiIntegrationTab ?tabsWithApi:tabs}
       selectedTab={selectedTabId}
       onTabChange={handleTabChangeFn}
     />

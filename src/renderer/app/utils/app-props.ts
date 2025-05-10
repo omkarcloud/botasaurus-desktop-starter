@@ -1,4 +1,4 @@
-export const apiConfig = {
+export const appProps = {
     "header_title": "Botasaurus",
     "description": "Build Awesome Scrapers with Botasaurus, The All in One Scraping Framework.",
     "right_header": {
@@ -11,6 +11,7 @@ export const apiConfig = {
         {
             "name": "Scrape Heading Task",
             "scraper_name": "scrapeHeadingTask",
+            "route_path": "scrape-heading-task",
             "input_js": "/**\n * @typedef {import('botasaurus-controls').Controls} Controls\n * @typedef {import('botasaurus-controls').FileTypes} FileTypes\n * \n */\n\n/**\n * @param {Controls} controls\n */\nfunction getInput(controls) {\n    controls\n        // Render a Link Input\n        .link('link', { isRequired: true, defaultValue: \"https://stackoverflow.blog/open-source\" })\n}\n",
             "input_js_hash": "69fc72f1db61af05ec70a6f385e8591a",
             "filters": [],
@@ -21,7 +22,8 @@ export const apiConfig = {
                 }
             ],
             "views": [],
-            "default_sort": "no_sort"
+            "default_sort": "no_sort",
+            "max_runs": 1
         }
     ]
 }
