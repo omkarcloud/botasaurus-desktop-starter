@@ -23,7 +23,7 @@ export const appProps = {
             ],
             "views": [],
             "default_sort": "no_sort",
-            "max_runs": null
+            "max_runs": 1
         }
     ],
     "show_api_integration_tab": true

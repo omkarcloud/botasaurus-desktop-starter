@@ -1,6 +1,8 @@
-name: Package
-
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - main
 
 jobs:
   package-mac:
