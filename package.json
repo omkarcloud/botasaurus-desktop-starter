@@ -67,8 +67,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^6.16.0",
-    "rebrowser-playwright-core": "^1.49.1"
+    "react-router-dom": "^6.16.0"
   },
   "devDependencies": {
     "@electron/notarize": "^2.5.0",
