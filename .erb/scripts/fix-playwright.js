@@ -2,22 +2,22 @@ const fs = require('fs');
 const path = require('path');
 
 const find = `async function installAppIcon(page) {
-  const icon = await import_fs.default.promises.readFile(require.resolve("./chromium/appIcon.png"));
+  const icon = await _fs.default.promises.readFile(require.resolve('./chromium/appIcon.png'));
   const crPage = page._delegate;
-  await crPage._mainFrameSession._client.send("Browser.setDockTile", {
-    image: icon.toString("base64")
+  await crPage._mainFrameSession._client.send('Browser.setDockTile', {
+    image: icon.toString('base64')
   });
 }`
 const replacement = `async function installAppIcon(page) {
-  // const icon = await import_fs.default.promises.readFile(require.resolve("./chromium/appIcon.png"));
+  // const icon = await _fs.default.promises.readFile(require.resolve('./chromium/appIcon.png'));
   // const crPage = page._delegate;
-  // await crPage._mainFrameSession._client.send("Browser.setDockTile", {
-  //   image: icon.toString("base64")
+  // await crPage._mainFrameSession._client.send('Browser.setDockTile', {
+  //   image: icon.toString('base64')
   // });
 }`
 
-const find1 = `var bidiMapper = __toESM(require("chromium-bidi/lib/cjs/bidiMapper/BidiMapper"));
-var bidiCdpConnection = __toESM(require("chromium-bidi/lib/cjs/cdp/CdpConnection"));
+const find1 = `var bidiMapper = _interopRequireWildcard(require("chromium-bidi/lib/cjs/bidiMapper/BidiMapper"));
+var bidiCdpConnection = _interopRequireWildcard(require("chromium-bidi/lib/cjs/cdp/CdpConnection"));
 `
 const replacement1 = `var bidiMapper = null;
 var bidiCdpConnection =  null;
