@@ -80,7 +80,8 @@ function runAppAndApi() {
       })
     }
   } else if (hasServerArguments) {
-    throw new Error('Kindly enable the server following https://github.com/microsoft/playwright/issues/13288 before passing server arguments')
+    console.error('Kindly enable the API in "api-config.ts" before passing API arguments.');
+    app.exit(1);
   }
   runApp(onQuit, () => {
     if (API) {
