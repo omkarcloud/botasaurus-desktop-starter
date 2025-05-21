@@ -257,7 +257,7 @@ export function createApiREADME(
   views: any[],
   defaultSort: string,
   route_path:string,
-  max_runs: number | null): string {
+  max_runs: number | null, apiBasePath): string {
     const maxRunsMessage = max_runs === null
     ? "This scraper supports unlimited concurrent tasks."
     : max_runs === 1
