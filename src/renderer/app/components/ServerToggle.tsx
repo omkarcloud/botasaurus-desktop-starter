@@ -7,6 +7,12 @@ import SwitchField from './inputs/SwitchField';
 // Local variables (outside component)
 let serverRunning = null;
 let serverPort = null;
+let apiBasePath = null;
+
+export function getApiBasePath() {
+  return apiBasePath
+}
+
 
 export function getPort() {
   return serverPort
@@ -17,9 +23,10 @@ export function getURL(port = getPort()): string {
 }
 
 // Listen for server-state once globally (outside component)
-ipcRenderer.once('server-state', ({ isRunning, port }: any) => {
+ipcRenderer.once('server-state', ({ isRunning, port , apiBasePath}: any) => {
   serverRunning = isRunning;
   serverPort = port;
+  apiBasePath = apiBasePath
 });
 
 const ServerToggle = () => {

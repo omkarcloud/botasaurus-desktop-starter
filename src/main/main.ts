@@ -65,7 +65,7 @@ process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
 function runAppAndApi() {
   const API = getAPI()
-  let { port, onlyRunApi, hasServerArguments } = getApiArgs()
+  let { port, onlyRunApi, hasServerArguments, apiBasePath} = getApiArgs()
   let finalPORT:number
   let onQuit
   if (API) {
@@ -76,7 +76,7 @@ function runAppAndApi() {
        
        return runAppWithoutWindow(onQuit, () => {
         closeServerOnExit()
-        startServer(finalPORT, Server.getScrapersConfig())
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
       })
     }
   } else if (hasServerArguments) {
@@ -87,7 +87,7 @@ function runAppAndApi() {
       closeServerOnExit()
       ipcMain.on('start-server', () => {
         getBotasaurusStorage().setItem('shouldStartServer', true)
-        startServer(finalPORT, Server.getScrapersConfig())
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
       })
 
       ipcMain.on('stop-server', () => {
@@ -95,9 +95,9 @@ function runAppAndApi() {
         stopServer()
       })
         const shouldStartServer = getBotasaurusStorage().getItem('shouldStartServer', API.autoStart)
-        ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT })
+        ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT,  apiBasePath: apiBasePath || API.apiBasePath})
         if (shouldStartServer) {
-          startServer(finalPORT, Server.getScrapersConfig())
+          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
       }
 
     }

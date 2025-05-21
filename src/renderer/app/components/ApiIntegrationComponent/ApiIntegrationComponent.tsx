@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { EmptyScraper } from '../Empty/Empty'
 import MarkdownComponent from '../MarkdownComponent/MarkdownComponent'
 import ScraperSelector from '../ScraperSelector/ScraperSelector'
-import ServerToggle from '../ServerToggle'
+import ServerToggle, { getApiBasePath } from '../ServerToggle'
 import { getBaseUrl } from './getBaseUrl'
 import { createApiREADME } from './createApiREADME'
 
@@ -25,7 +25,7 @@ const ContentContainer = ({ selectedScraper, hasSingleScraper }: { selectedScrap
   //@ts-ignore
   const defdata = controls.getDefaultData()
 
-  const readmeContent = createApiREADME(baseUrl, selectedScraper.scraper_name,hasSingleScraper, defdata, sorts, filters, views, default_sort, selectedScraper.route_path, selectedScraper.max_runs,)
+  const readmeContent = createApiREADME(baseUrl, selectedScraper.scraper_name,hasSingleScraper, defdata, sorts, filters, views, default_sort, selectedScraper.route_path, selectedScraper.max_runs, getApiBasePath())
   return <MarkdownComponent content={readmeContent} />
 }
 

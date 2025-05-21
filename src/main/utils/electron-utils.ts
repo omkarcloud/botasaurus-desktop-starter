@@ -6,6 +6,7 @@ import { isDev } from 'botasaurus-server/env'
 import { getWindow } from './window';
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import { config } from '../config'
+import { cleanBasePath } from 'botasaurus-server/utils'
 
 export function restoreAndFocusMainWindow() {
     const w = getWindow()
@@ -72,32 +73,39 @@ return path.join(getResourcesPath(), ...paths);
 
 export function getApiArgs() {
   const args = process.argv
-
   // Parse arguments
-  let port:number = null  as any// default
-  let onlyRunApi = false
-  let hasServerArguments = false
+  let port: number = null as any; // default
+  let onlyRunApi = false;
+  let hasServerArguments = false;
+  let apiBasePath: string | null = null;
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--port' ) {
-      hasServerArguments = true
+    if (args[i] === '--port') {
+      hasServerArguments = true;
       if (i + 1 < args.length) {
         try {
-          port = parseInt(args[i + 1])  
-          if (port > 1){
-            i++
+          port = parseInt(args[i + 1]);
+          if (port > 1) {
+            i++;
           }
-          
         } catch (error) {
-          console.error(port)
+          console.error(port);
         }
       }
     } else if (args[i] === '--only-start-api') {
-      hasServerArguments = true
-      onlyRunApi = true
+      hasServerArguments = true;
+      onlyRunApi = true;
+    } else if (args[i] === '--api-base-path') {
+      hasServerArguments = true;
+      if (i + 1 < args.length) {
+        if (args[i + 1]) {
+          apiBasePath = cleanBasePath(args[i + 1]) as any  
+        }
+        i++;
+      }
     }
   }
-  return { port, onlyRunApi, hasServerArguments }
+  return { port, onlyRunApi, hasServerArguments, apiBasePath};
 }
 
 
