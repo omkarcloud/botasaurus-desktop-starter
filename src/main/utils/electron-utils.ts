@@ -77,7 +77,7 @@ export function getApiArgs() {
   let port: number = null as any; // default
   let onlyRunApi = false;
   let hasServerArguments = false;
-  let apiBasePath: string | null = null;
+  let apiBasePath: string  = '';
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--port') {

@@ -7,10 +7,10 @@ import SwitchField from './inputs/SwitchField';
 // Local variables (outside component)
 let serverRunning = null;
 let serverPort = null;
-let apiBasePath = null;
+let serverApiBasePath = null;
 
 export function getApiBasePath() {
-  return apiBasePath
+  return serverApiBasePath
 }
 
 
@@ -26,7 +26,7 @@ export function getURL(port = getPort()): string {
 ipcRenderer.once('server-state', ({ isRunning, port , apiBasePath}: any) => {
   serverRunning = isRunning;
   serverPort = port;
-  apiBasePath = apiBasePath
+  serverApiBasePath = apiBasePath
 });
 
 const ServerToggle = () => {
@@ -44,7 +44,7 @@ const ServerToggle = () => {
   };
 
   return (
-    <EuiFormRow className="mb-4 !mt-0" label={<div>Start API Server on port <EuiLink target={'_blank'} href={getURL(serverPort)}>{serverPort}</EuiLink></div>} fullWidth>
+    <EuiFormRow className="mb-4 !mt-0" label={<div>Start API Server on port <EuiLink target={'_blank'} href={getURL(serverPort) + serverApiBasePath}>{serverPort}</EuiLink></div>} fullWidth>
       <SwitchField value={isRunning} onChange={handleToggle} />
     </EuiFormRow>
   );
