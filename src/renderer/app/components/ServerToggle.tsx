@@ -8,26 +8,32 @@ import SwitchField from './inputs/SwitchField';
 let serverRunning = null;
 let serverPort = null;
 let serverApiBasePath = null;
+let routeAliases = null;
 
-export function getApiBasePath() {
-  return serverApiBasePath
+export function getApiBasePath():any {
+  return serverApiBasePath;
 }
 
-
 export function getPort() {
-  return serverPort
+  return serverPort;
 }
 
 export function getURL(port = getPort()): string {
-  return `http://127.0.0.1:${port}`
+  return `http://127.0.0.1:${port}`;
+}
+
+export function getRouteAliases():any {
+  return routeAliases;
 }
 
 // Listen for server-state once globally (outside component)
-ipcRenderer.once('server-state', ({ isRunning, port , apiBasePath}: any) => {
+ipcRenderer.once('server-state', ({ isRunning, port, apiBasePath, routeAliases: aliases }: any) => {
   serverRunning = isRunning;
   serverPort = port;
-  serverApiBasePath = apiBasePath
+  serverApiBasePath = apiBasePath;
+  routeAliases = aliases;
 });
+
 
 const ServerToggle = () => {
   const [isRunning, setIsRunning] = useState(serverRunning);

@@ -6,7 +6,7 @@ import path from 'path'
 import { setUpRendererToServerCall } from './utils/set-up-renderer-to-server-call'
 import { isDev } from 'botasaurus-server/env'
 import { initAutoIncrementDb } from 'botasaurus-server/models'
-import {getAssetPath, resolveHtmlPath, enableElectronDebugTools, registerDeepLinkProtocol, restoreAndFocusMainWindow, getApiArgs, getAPI, startServer, stopServer } from './utils/electron-utils'
+import {getAssetPath, resolveHtmlPath, enableElectronDebugTools, registerDeepLinkProtocol, restoreAndFocusMainWindow, getApiArgs, getAPI, startServer, stopServer, createRouteAliasesObj } from './utils/electron-utils'
 import MenuBuilder from './menu'
 import { onClose } from "botasaurus/on-close";
 import { getWindow, setWindow } from './utils/window'
@@ -76,7 +76,7 @@ function runAppAndApi() {
        
        return runAppWithoutWindow(onQuit, () => {
         closeServerOnExit()
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
       })
     }
   } else if (hasServerArguments) {
@@ -88,7 +88,7 @@ function runAppAndApi() {
       closeServerOnExit()
       ipcMain.on('start-server', () => {
         getBotasaurusStorage().setItem('shouldStartServer', true)
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
       })
 
       ipcMain.on('stop-server', () => {
@@ -96,9 +96,9 @@ function runAppAndApi() {
         stopServer()
       })
         const shouldStartServer = getBotasaurusStorage().getItem('shouldStartServer', API.autoStart)
-        ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT,  apiBasePath: apiBasePath || API.apiBasePath})
+        ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT,  apiBasePath: apiBasePath || API.apiBasePath, routeAliases:createRouteAliasesObj(API) })
         if (shouldStartServer) {
-          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath)
+          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
       }
 
     }

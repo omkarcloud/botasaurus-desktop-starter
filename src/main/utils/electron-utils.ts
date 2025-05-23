@@ -132,3 +132,14 @@ export function stopServer(): any {
   // @ts-ignore
   return  global.stopServer();
 }
+
+export function createRouteAliasesObj(API: any) {
+  const routeAliases = API.routeAliases
+  const routeAliasesObj: Record<string, string[]> = {}
+  for (const [fn, aliases] of routeAliases.entries()) {
+    if (typeof fn === 'function' && fn.__name__) {
+      routeAliasesObj[fn.__name__] = aliases
+    }
+  }
+  return routeAliasesObj
+}
