@@ -76,6 +76,7 @@ const SingleSelectWithLabel = ({ label, value, onChange, options }) => {
     <EuiFormRow fullWidth label={label}>
       <SingleSelect
         fullWidth
+        allowCustomOptions
         options={options}
         value={value}
         onChange={onChange}
@@ -89,6 +90,7 @@ const MultiSelectWithLabel = ({ label, value, onChange, options }) => {
     <EuiFormRow fullWidth label={label}>
       <MultiSelect
         fullWidth
+        allowCustomOptions
         options={options}
         value={value}
         onChange={onChange}

@@ -4,6 +4,7 @@ export default function SingleSelect({
   options,
   value,
   onChange,
+  allowCustomOptions = false,
   ...props
 }: any) {
   let selected = options.find(x => x.value === value)
@@ -11,6 +12,15 @@ export default function SingleSelect({
     selected = { value, label: value }
   }
 
+  const onCreateOption = (searchValue) => {
+    const normalizedSearchValue = searchValue.trim()
+
+    if (!normalizedSearchValue) {
+      return
+    }
+
+    onChange(normalizedSearchValue)
+  }
   return (
     <EuiComboBox
       isClearable={true}
@@ -22,6 +32,7 @@ export default function SingleSelect({
         onChange(change)
       }}
       singleSelection={{ asPlainText: true }}
+      onCreateOption={allowCustomOptions && onCreateOption}      
     />
   )
 }

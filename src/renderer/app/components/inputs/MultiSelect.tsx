@@ -4,9 +4,25 @@ export default function MultiSelect({
   options,
   value,
   onChange,
+  allowCustomOptions = false,
   ...props
 }: any) {
   const selected = value
+  const onCreateOption = (searchValue) => {
+    const normalizedSearchValue = searchValue.trim()
+
+    if (!normalizedSearchValue) {
+      return
+    }
+
+    onChange([
+      ...selected,
+      {
+        value: normalizedSearchValue,
+        label: normalizedSearchValue
+      }
+    ])
+  }
   return (
     <EuiComboBox
       {...props}
@@ -15,6 +31,7 @@ export default function MultiSelect({
       onChange={option => {
         onChange(option)
       }}
+      onCreateOption={allowCustomOptions && onCreateOption}      
       isClearable={true}
     />
   )
