@@ -32,7 +32,8 @@ jobs:
           max_attempts: 2
           command: npm run package:publish
         env:
-          # Uncomment the following environment variables when enabling code signing for macOS:          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # Uncomment the following environment variables when enabling code signing for macOS. Code signing is a compulsory step when releasing macOS installers to end users.
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
           # APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # CSC_LINK: ${{ secrets.CSC_LINK }}
