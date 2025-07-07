@@ -282,6 +282,9 @@ function makeAPI(baseUrl, apiBasePath) {
   if (apiBasePath) {
     config.push(`apiBasePath: '${apiBasePath}'`)
   }
+  
+  config.push(`createResponseFiles: true`)
+
 
   return config.length > 0 ? `const api = new Api({ ${config.join(', ')} })` : 'const api = new Api()'
 }
@@ -349,12 +352,9 @@ async function main() {
 main()
 \`\`\`
 
-Additionally, the API client will create response JSON files in the \`output/responses/\` directory to help with debugging and development. If you want to disable this feature in production, you can set \`createResponseFiles=false\`.
+Additionally, the API client will create response JSON files in the \`output/responses/\` directory to help with debugging and development.
 
-\`\`\`javascript
-const api = ${makeResponseFn(baseUrl, apiBasePath)}
-
-\`\`\`
+In production, remove the \`createResponseFiles: true\` parameter.
 
 ### Creating Tasks
 
