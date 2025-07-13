@@ -339,7 +339,7 @@ npm install botasaurus-desktop-api
 First, import the \`Api\` class from the library:
 
 \`\`\`javascript
-import { Api } from 'botasaurus-desktop-api'
+import Api from 'botasaurus-desktop-api'
 
 \`\`\`
 Then, create an instance of the \`Api\` class:
@@ -453,7 +453,7 @@ Here are some example usages of the API client:
 
 \`\`\`javascript
 import fs from 'fs'
-import { Api } from 'botasaurus-desktop-api'
+import Api from 'botasaurus-desktop-api'
 
 async function main() {
   // Create an instance of the API client
