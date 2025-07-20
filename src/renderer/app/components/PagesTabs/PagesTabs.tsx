@@ -6,14 +6,14 @@ import Tabs from '../Tabs/Tabs';
 
 export const TabsId = {
   INPUT: 'input',
-  OUTPUT: 'output',
+  TASKS: 'tasks',
   ABOUT: 'about',
   API_INTEGRATION: 'api-integration',
 }
 
 const tabs = [
   { route: '/', id: TabsId.INPUT, name: 'Input', content: <></> },
-  { route: '/output', id: TabsId.OUTPUT, name: 'Output', content: <></> },
+  { route: '/tasks', id: TabsId.TASKS, name: 'Tasks', content: <></> },
   { route: '/about', id: TabsId.ABOUT, name: 'About', content: <></> },
   
 ]

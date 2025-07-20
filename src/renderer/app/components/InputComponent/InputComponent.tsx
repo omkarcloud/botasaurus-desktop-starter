@@ -516,7 +516,7 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
         }else {
           const outputId = isarr ? result[0].id : result.id
           if (outputId) {
-            pushToRoute(router, `/output/${outputId}`)
+          pushToRoute(router, `/tasks/${outputId}`)
           } else {
             console.error("failed", result)
           }

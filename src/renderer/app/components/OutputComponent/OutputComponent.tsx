@@ -181,7 +181,7 @@ const TaskTable = ({ activePage, onPageClick, isLoading, total_pages, tasks, upd
       name: 'View Task',
       render: id => {
         return (
-          <Link href={`/output/${id}`} passHref>
+          <Link href={`/tasks/${id}`} passHref>
             <EuiLink>{`View Task ${id.toString()}`}</EuiLink>
           </Link>
         )
@@ -376,10 +376,10 @@ const OutputComponent = (props) => {
     <ServerStatusComponent />
     <Description {...props} />
     <Tabs showApiIntegrationTab={props.show_api_integration_tab} onTabChange={((id) => {
-      if (id === TabsId.OUTPUT) {
+      if (id === TabsId.TASKS) {
         onPageChange(1)
       }
-    }) as any } initialSelectedTab={TabsId.OUTPUT} />
+    }) as any } initialSelectedTab={TabsId.TASKS} />
   </OutputTabsContainer>
     <OutputContainer>
       <TabWrapper>

@@ -16,8 +16,8 @@ const Main = () => {
           <FactoryResetModal/>
                 <Router>
       <Routes>
-      <Route  path="/output/:taskId" element={<OutputTaskPage />} />
-        <Route path={Links.output} element={<OutputPage />} />
+      <Route  path="/tasks/:taskId" element={<OutputTaskPage />} />
+        <Route path={Links.tasks} element={<OutputPage />} />
         <Route path={Links.about} element={<AboutPage />} />
         <Route path={Links.apiIntegration} element={<ApiIntegration />} />
         <Route path={Links.home} element={<HomePage />} />

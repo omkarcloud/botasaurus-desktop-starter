@@ -331,7 +331,7 @@ const TaskComponent = ({
     <>
       <OutputTabsContainer>
         <div className='space-y-6 '>
-          <Link href={`/output`} passHref>
+          <Link href={`/tasks`} passHref>
             <EuiLink>View All Tasks</EuiLink>
           </Link>
           {can_sort_filter && (is_large ? 

@@ -11,7 +11,7 @@ import { getPublicAsset } from '../../utils/missc'
 
 
 function OutputLink() {
-  return <Link href={`/output`} passHref>
+  return <Link href={`/tasks`} passHref>
     <EuiLink>View All Tasks</EuiLink>
   </Link>
 }

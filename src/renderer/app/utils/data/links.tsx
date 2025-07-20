@@ -1,6 +1,6 @@
 const Links = {
   home: '/',
-  output: '/output',
+  tasks: '/tasks',
   about: '/about',
   apiIntegration: '/api-integration',
   notFound: '/404',
