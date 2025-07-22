@@ -300,7 +300,8 @@ export function createApiREADME(
   route_path: string,
   max_runs: number | null,
   apiBasePath: string, 
-  routeAliases:string[]
+  routeAliases:string[],
+  enable_cache: boolean
 ): string {
   const maxRunsMessage = max_runs === null
     ? "This scraper supports unlimited concurrent tasks."
@@ -439,8 +440,7 @@ This will:
 - Make a **GET** request to the \`${final[0]}\` endpoint.
 - Bypass task creation, scheduling, and running overhead.
 - Validate the input data before execution.
-- Cache the results based on the provided parameters.
-- ${maxRunsMessage2}
+${enable_cache ? '- Cache the results based on the provided parameters.\n' : ''}- ${maxRunsMessage2}
 
 This method is especially useful when:
 
