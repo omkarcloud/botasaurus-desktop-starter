@@ -76,7 +76,7 @@ function runAppAndApi() {
        
        return runAppWithoutWindow(onQuit, () => {
         closeServerOnExit()
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
       })
     }
   } else if (hasServerArguments) {
@@ -88,7 +88,7 @@ function runAppAndApi() {
       closeServerOnExit()
       ipcMain.on('start-server', () => {
         getBotasaurusStorage().setItem('shouldStartServer', true)
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
+        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
       })
 
       ipcMain.on('stop-server', () => {
@@ -98,7 +98,7 @@ function runAppAndApi() {
         const shouldStartServer = getBotasaurusStorage().getItem('shouldStartServer', API.autoStart)
         ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT,  apiBasePath: apiBasePath || API.apiBasePath, routeAliases:createRouteAliasesObj(API) })
         if (shouldStartServer) {
-          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API))
+          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
       }
 
     }
