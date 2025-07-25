@@ -11,14 +11,16 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
-import { prodMainCopyPlugins, moduleRules } from './copy-plugin'
+import { prodMainCopyPlugins } from './copy-plugin'
 
 checkNodeEnv('production');
 deleteSourceMaps();
 
+const MINIFY = process.env.MINIFY !== 'false';
+
 const configuration: webpack.Configuration = {
   devtool: false,
-  // module: {...moduleRules},
+
   mode: 'production',
 
   target: 'electron-main',
@@ -36,12 +38,15 @@ const configuration: webpack.Configuration = {
     },
   },
 
-  optimization: {
+  optimization: MINIFY ? {
     minimizer: [
       new TerserPlugin({
         parallel: true,
       }),
     ],
+  } : {
+    minimize: false, // ← Disables all minification
+    concatenateModules: false, // ← Optional: Prevents module concatenation
   },
 
   plugins: [

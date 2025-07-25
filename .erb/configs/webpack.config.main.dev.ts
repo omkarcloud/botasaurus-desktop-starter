@@ -9,7 +9,7 @@ import { merge } from 'webpack-merge';
 import checkNodeEnv from '../scripts/check-node-env';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
-import { devMainCopyPlugins, moduleRules } from './copy-plugin'
+import { devMainCopyPlugins } from './copy-plugin'
 import { LogContentsPlugin } from './webpack.custom-plugins'
 
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
@@ -19,8 +19,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 const configuration: webpack.Configuration = {
   devtool: 'inline-source-map',
-
-  // module: {...moduleRules},
 
   mode: 'development',
 

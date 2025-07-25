@@ -49,7 +49,9 @@ function getAppProps() {
 }
 
 function createAsyncTask(data: any) {
-    return fetch({ route: "createAsyncTask", message: 'Starting Task', silentOnError:true }, data)
+    const withResults = false
+    const giveFirstResultOnly = true
+    return fetch({ route: "createAsyncTask", message: 'Starting Task', silentOnError:true }, data, withResults, giveFirstResultOnly)
 }
 
 function getApi() {

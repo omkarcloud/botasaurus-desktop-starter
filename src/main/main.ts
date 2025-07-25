@@ -10,6 +10,7 @@ import {getAssetPath, resolveHtmlPath, enableElectronDebugTools, registerDeepLin
 import MenuBuilder from './menu'
 import { onClose } from "botasaurus/on-close";
 import { getWindow, setWindow } from './utils/window'
+import scraperToInputJs from './utils/scraper-to-input-js'
 import run from 'botasaurus-server/run';
 import { Server } from 'botasaurus-server/server';
 
@@ -76,7 +77,7 @@ function runAppAndApi() {
        
        return runAppWithoutWindow(onQuit, () => {
         closeServerOnExit()
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
+        return startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
       })
     }
   } else if (hasServerArguments) {
@@ -155,6 +156,21 @@ const createWindow = async (onWindowMade, runFn) => {
   AppUpdater.init()
 }
 
+async function initDbAndExecutor(onReady) {
+  
+      await initAutoIncrementDb()
+      // Set the scraper input functions
+      Server.setScraperToInputJs(scraperToInputJs); 
+      await run()
+      if (onReady) {
+        await onReady()  
+      }
+      
+      // Remove this if your app does not use auto updates
+      // eslint-disable-next-line
+      AppUpdater.init()
+  
+}
 function runApp(onQuit, onWindowMade) {
   registerDeepLinkProtocol()
   app.on('second-instance', (event, commandLine, workingDirectory) => {
@@ -182,8 +198,7 @@ function runApp(onQuit, onWindowMade) {
     .whenReady()
     .then(() => {
       createWindow(onWindowMade, () => {
-        run()
-        initAutoIncrementDb()
+        return initDbAndExecutor(null)
       })
       powerSaveId = powerSaveBlocker.start('prevent-app-suspension')
 
@@ -221,9 +236,7 @@ function runAppWithoutWindow(onQuit, onReady) {
   app
     .whenReady()
     .then(() => {
-      run()
-      initAutoIncrementDb()
-      onReady()
+      initDbAndExecutor(onReady)
 
       powerSaveId = powerSaveBlocker.start('prevent-app-suspension')
 

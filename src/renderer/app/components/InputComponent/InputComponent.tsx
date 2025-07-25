@@ -7,6 +7,7 @@ import { EuiToolTip } from '@elastic/eui/optimize/es/components/tool_tip/tool_ti
 import { Control, createControls, WithChooseOptions } from 'botasaurus-controls';
 import { useMemo, useRef, useState } from 'react';
 
+import scraperToInputJs from '../../utils/scraper-to-input-js';
 import Api from '../../utils/api';
 import Toast from '../../utils/cogo-toast';
 import { isEmptyObject } from '../../utils/missc';
@@ -398,7 +399,7 @@ function getLastScraper(scrapers) {
 }
 
 function createInitialData(selectedScraper: any) {
-  const controls = createControls(selectedScraper.input_js)
+  const controls = createControls(scraperToInputJs[selectedScraper.scraper_name])
   const initial_data = getInitialData(
     selectedScraper.scraper_name,
     selectedScraper.input_js_hash,
@@ -421,7 +422,7 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
   })
   
   const controls = useMemo(
-    () => createControls(selectedScraper.input_js),
+    () => createControls(scraperToInputJs[selectedScraper.scraper_name]),
     [selectedScraper.scraper_name]
   )
 

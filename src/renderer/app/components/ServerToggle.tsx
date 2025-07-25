@@ -50,7 +50,7 @@ const ServerToggle = () => {
   };
 
   return (
-    <EuiFormRow className="mb-4 !mt-0" label={<div>Start API Server on port <EuiLink target={'_blank'} href={getURL(serverPort) + serverApiBasePath}>{serverPort}</EuiLink></div>} fullWidth>
+    <EuiFormRow className="mb-4 !mt-0" label={<>Start API Server on port <EuiLink target={'_blank'} href={getURL(serverPort) + serverApiBasePath}>{serverPort}</EuiLink></>} fullWidth>
       <SwitchField value={isRunning} onChange={handleToggle} />
     </EuiFormRow>
   );

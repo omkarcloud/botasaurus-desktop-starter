@@ -4,6 +4,7 @@ import {
   pathTaskResults,
   targetDirectory,
   db_path,
+  id_path,
 } from 'botasaurus-server/utils';
 import { removeSync } from 'botasaurus/utils';
 import { AppUpdater } from './utils/AppUpdater';
@@ -72,7 +73,7 @@ function clearRendererStorage() {
 }
 
 function deleteAppData() {
-  return removeSync([pathTaskResults, db_path]);
+  return removeSync([pathTaskResults, db_path, id_path]);
 }
 
 function quitAndReopen() {
