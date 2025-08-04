@@ -32,6 +32,8 @@ const electronHandler = {
     },
   },
   getPathForFile: webUtils.getPathForFile,
+  openFolderPicker: (defaultPath) => ipcRenderer.invoke('dialog:openFolder', defaultPath)
+
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);

@@ -250,28 +250,6 @@ fs.writeFileSync(filename, buffer)
   }
 }
 
-function makeResponseFn(baseUrl: string, apiBasePath: string) {
-  if (baseUrl && apiBasePath) {
-    return `new Api({
-  apiUrl: '${baseUrl}',
-  apiBasePath: '${apiBasePath}',
-  createResponseFiles: false,
-})`
-  } else if (baseUrl) {
-    return `new Api({
-  apiUrl: '${baseUrl}',
-  createResponseFiles: false,
-})`
-  } else if (apiBasePath) {
-    return `new Api({
-  apiBasePath: '${apiBasePath}',
-  createResponseFiles: false,
-})`
-  } else {
-    return `new Api({ createResponseFiles: false })`
-  }
-}
-
 function makeAPI(baseUrl, apiBasePath) {
   const config: string[] = []
 
@@ -438,13 +416,13 @@ const result = await api.get('${final[0]}', ${jsObjectToJsObjectString(defaultDa
 \`\`\`
 This will:
 - Make a **GET** request to the \`${final[0]}\` endpoint.
-- Bypass task creation, scheduling, and running overhead.
-- Validate the input data before execution.
+- Execute the scraper immediately, bypassing task creation, scheduling, and running overhead.
+- Validate input data before execution, returning a \`400\` error for invalid requests.
 ${enable_cache ? '- Cache the results based on the provided parameters.\n' : ''}- ${maxRunsMessage2}
 
 This method is especially useful when:
 
-- You simply want to call the scraper and get the result.
+- You simply want to call the scraper and get the result, without the task management overhead.
 - You plan to resell the API via platforms like **RapidAPI**, where the task abstraction is unnecessary.
 
 ## Examples

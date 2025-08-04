@@ -12,21 +12,22 @@ import { useState } from 'react';
 import ClickOutside from '../ClickOutside/ClickOutside';
 import CheckboxField from '../inputs/CheckBoxField';
 import Tabs from '../Tabs/Tabs';
+import { openFolderPicker } from '../../utils/electron'
 
 function getprefs() {
   if (typeof window === 'undefined') {
-    return { format: 'csv', convert_to_english: true }
+    return { format: 'csv', convert_to_english: true, downloadFolder: null }
   }
 
   let downloadPreference
   try {
     downloadPreference = JSON.parse(
       localStorage.getItem('download_preference') ||
-        '{"format": "csv", "convert_to_english": true}'
+        '{"format": "csv", "convert_to_english": true, "downloadFolder": null}'
     )
   } catch (error) {
     console.error('Error parsing download preferences:', error)
-    downloadPreference = { format: 'csv', convert_to_english: true } // Default value in case of error
+    downloadPreference = { format: 'csv', convert_to_english: true, downloadFolder: null } // Default value in case of error
   }
   return downloadPreference
 }
@@ -51,32 +52,67 @@ const tabs = [
   },
 ]
 
-const DownloadForm = ({ onSubmit }) => {
+function isWindowsBrowser() {
+  return navigator.platform.indexOf('Win') > -1;
+}
+
+export function getSeparator(): string {
+  return isWindowsBrowser() ? '\\' : '/';
+}
+
+const DownloadForm = ({ onSubmit , productName}) => {
+
+  function updatePrefs(change) {
+      prefs = change
+      localStorage.setItem('download_preference', JSON.stringify(change))
+  }
+
   const [state, setState] = useState(getprefs)
 
-  const onTabClick = selectedTab => {
-    setState({
+
+
+  function onTabClick(selectedTab) {
+    const change = {
       ...state,
       format: selectedTab.id,
-    })
+    }
+    updatePrefs(change)
+    setState(change)
   }
 
-  const handleCheckboxChange = e => {
-    setState({
+  function handleCheckboxChange(e) {
+    const change = {
       ...state,
       convert_to_english: e,
-    })
+    }
+    updatePrefs(change)
+    setState(change)
   }
 
+  async function handleDownloadFolderChange() {
+    try {
+        const folderPath  = await openFolderPicker(state.downloadFolder)
+      if (folderPath) {
+        const change = {
+          ...state,
+          downloadFolder: folderPath,
+        }
+        updatePrefs(change)
+        setState(change)
+      }
+    } catch (error) {
+      console.error('Error selecting download folder:', error)
+    }
+  }
   const handleSubmit = event => {
     event.preventDefault()
-    prefs = state
-    localStorage.setItem('download_preference', JSON.stringify(state))
+    updatePrefs(state)
     if (onSubmit) {
       onSubmit(state)
     }
   }
 
+  const downloadLabel = `Save downloads to folder: ${state.downloadFolder ?? 'Downloads'}${getSeparator()}${productName}`
   return (
     <EuiForm component="form" onSubmit={handleSubmit}>
       <EuiFormRow
@@ -87,6 +123,21 @@ const DownloadForm = ({ onSubmit }) => {
       </EuiFormRow>
 
       <EuiFormRow
+            className="text-left"
+
+        label={downloadLabel }
+        fullWidth>
+            <EuiButton
+
+            size="s"
+            onClick={handleDownloadFolderChange}
+          >
+            Change
+          </EuiButton>
+      </EuiFormRow>
+
+      <EuiFormRow
+      className="text-left"
         label={
           <EuiToolTip content="Convert non-English characters (like é, ñ, あ) to their English equivalents (e, n, a).">
             <span>
@@ -110,7 +161,7 @@ const DownloadForm = ({ onSubmit }) => {
   )
 }
 
-function useDownloadModal(onDownload) {
+function useDownloadModal(onDownload, productName) {
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const toggleModal = () => {
@@ -134,7 +185,7 @@ function useDownloadModal(onDownload) {
             <EuiModalHeaderTitle>Download Results</EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody>
-            <DownloadForm onSubmit={successClose} />
+            <DownloadForm productName={productName} onSubmit={successClose} />
           </EuiModalBody>
         </div>
       </ClickOutside>
@@ -143,15 +194,14 @@ function useDownloadModal(onDownload) {
 
   return { showModal: () => setIsModalVisible(true), modal }
 }
-const DownloadStickyBar = ({ onDownload, showPagination }) => {
+const DownloadStickyBar = ({ productName, onDownload, showPagination }) => {
   function directDownload() {
     // gets download preference from local storage, if not then it is {"format": "csv", "convert_to_english": true }
     // if convert_to_english is true then the language will be converted to english
-    const downloadPreference = getprefs()
-    onDownload(downloadPreference)
+    onDownload(prefs)
   }
 
-  const { modal, showModal } = useDownloadModal(onDownload)
+  const { modal, showModal } = useDownloadModal(onDownload, productName)
   // @ts-ignore
   const fmt = `Download ${tabs.find(x => x.id === prefs.format).name}`
   return (

@@ -27,9 +27,15 @@ async function fetch({ route, message, silent, silentOnError }: any, ...data) {
         if (hidefn) {
             hidefn()
         }
-        if (!silent) {
-            if (!silentOnError) {
-                Toast.error('Something went wrong, please try again later.')
+
+        if (!silent && !silentOnError) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            if (errorMessage.includes('is currently open in another application')) {
+                const extractedMessage = errorMessage.split("Error: ")[1] || errorMessage
+                Toast.error(extractedMessage);
+                return 
+            } else {
+                Toast.error('Something went wrong, please try again later.');
             }
         }
 
@@ -42,7 +48,6 @@ async function fetch({ route, message, silent, silentOnError }: any, ...data) {
     }
     return { data: result, status: 200 }
 }
-
 function getAppProps() {
     return appProps
 

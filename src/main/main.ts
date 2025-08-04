@@ -3,7 +3,7 @@ import './config'
 import { generateAppProps } from './utils/generate-app-props'
 import { app, BrowserWindow, powerSaveBlocker, shell } from 'electron'
 import path from 'path'
-import { setUpRendererToServerCall } from './utils/set-up-renderer-to-server-call'
+import { addRoutesHandler, setUpRendererToServerCall } from './utils/set-up-renderer-to-server-call'
 import { isDev } from 'botasaurus-server/env'
 import { initAutoIncrementDb } from 'botasaurus-server/models'
 import {getAssetPath, resolveHtmlPath, enableElectronDebugTools, registerDeepLinkProtocol, restoreAndFocusMainWindow, getApiArgs, getAPI, startServer, stopServer, createRouteAliasesObj } from './utils/electron-utils'
@@ -120,9 +120,10 @@ const createWindow = async (onWindowMade, runFn) => {
     },
   })
   setWindow(mainWindow)
-  mainWindow.loadURL(resolveHtmlPath('index.html'))
-  setUpRendererToServerCall()
+  addRoutesHandler()
   
+  mainWindow.loadURL(resolveHtmlPath('index.html'))
+  setUpRendererToServerCall()  
 
   mainWindow.on('ready-to-show', () => {
     if (!getWindow()) {

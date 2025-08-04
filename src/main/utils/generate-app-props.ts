@@ -5,6 +5,7 @@ import { writeFile, readFile } from 'botasaurus/output';
 import { getAppProps } from 'botasaurus-server/task-routes';
 import { isDev } from 'botasaurus-server/env';
 import { hasAPI } from './electron-utils'
+import { config } from '../config'
 
   function makeScraperToInputJs(appProps: { scrapers: any[] }) {
     let scraperToInputJs = ''
@@ -49,10 +50,11 @@ function writeFiles(scraperToInputJs: string) {
 
 function generateAppProps() {
   const appProps = getAppProps();
+  appProps['productName'] = config.productName
+  
   if (hasAPI()) {
     // @ts-ignore
     appProps.show_api_integration_tab = true
-    
   }
 
   // Build scraperToInputJs string
@@ -61,12 +63,12 @@ function generateAppProps() {
   // Write scraperToInputJs file to renderer process
   writeFiles(scraperToInputJs)
 
-  const config = isDev
+  const props = isDev
     ? JSON.stringify(appProps, null, 4)
     : JSON.stringify(appProps);
 
   // const content = "export const appProps:any = " + config
-  const content = `export const appProps = ${config}`;
+  const content = `export const appProps = ${props}`;
 
   const outputFilePath = path.join(
     __dirname,

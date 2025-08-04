@@ -22,7 +22,7 @@ const Page = ({ taskId, scrapers, ...props }: any) => {
     <>
       <Seo title={`Results ${taskId}`} />
       <AuthedDashboard {...props}>
-        <TaskComponent taskId={taskId} response={response} {...scraperConfig} />
+        <TaskComponent taskId={taskId} response={response} {...scraperConfig} productName={props.productName} />
       </AuthedDashboard>
     </>
   )

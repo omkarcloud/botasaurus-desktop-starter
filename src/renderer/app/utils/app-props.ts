@@ -24,5 +24,6 @@ export const appProps = {
             "default_sort": "no_sort",
             "max_runs": 1
         }
-    ]
+    ],
+    "productName": "Todo My App Name"
 }

@@ -13,6 +13,8 @@ type IpcHandler =  {
 export const ipcRenderer: IpcHandler = electron.ipcRenderer
 // @ts-ignore
 export const getPathForFile = electron.getPathForFile
+// @ts-ignore
+export const openFolderPicker = electron.openFolderPicker
 
 ipcRenderer.on("log", console.log)
 
