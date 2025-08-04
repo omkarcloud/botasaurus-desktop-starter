@@ -1,0 +1,5 @@
+# 1. Bump the version
+node increment-version.js
+
+# 2. Re-stage the files that the script changed
+git add release/app/package.json release/app/package-lock.json
