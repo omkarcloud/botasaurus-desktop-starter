@@ -1,7 +1,6 @@
 import { shell, dialog } from 'electron';
 import { ipcMain } from './ipc-main';
 import * as routes from 'botasaurus-server/task-routes';
-import setUpErrorForwardingToRenderer from './set-up-error-forwarding-to-renderer';
 import { config } from '../config'
 
 let isBackendSetUp = false;
@@ -65,8 +64,6 @@ export function setUpRendererToServerCall() {
     }
     return null;
   });
-
-  setUpErrorForwardingToRenderer();
 
   isBackendSetUp = true;
 }
