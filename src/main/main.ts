@@ -65,6 +65,7 @@ process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 }
 
 function runAppAndApi() {
+  
   const API = getAPI()
   let { port, onlyRunApi, hasServerArguments, apiBasePath} = getApiArgs()
   let finalPORT:number

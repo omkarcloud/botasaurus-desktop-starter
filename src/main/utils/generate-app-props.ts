@@ -1,3 +1,4 @@
+import fs from 'fs';
 import '../../scraper/backend/server';
 import '../../scraper/backend/api-config';
 import * as path from 'path';
@@ -5,7 +6,6 @@ import { writeFile, readFile } from 'botasaurus/output';
 import { getAppProps } from 'botasaurus-server/task-routes';
 import { isDev } from 'botasaurus-server/env';
 import { hasAPI } from './electron-utils'
-import { config } from '../config'
 
   function makeScraperToInputJs(appProps: { scrapers: any[] }) {
     let scraperToInputJs = ''
@@ -47,10 +47,37 @@ function writeFiles(scraperToInputJs: string) {
     console.log('Updated main scraperToInputJs')
   }
 }
+function getProductNameFromPackageJson() {
+  let data = fs.readFileSync('./package.json', { encoding: 'utf-8' });
+  data = JSON.parse(data);
+  return [data['productName'], data['name']];
+}
+
+function writeConfig(productName: any, name: any) {
+  /**
+   * Updates the main config file with the provided product name and protocol name.
+   * @param productName - The product name to set in the config.
+   * @param name - The protocol name to set in the config.
+   */
+    
+    const configPath = path.join(__dirname, 'src/main/config.ts')
+    const configContent = readFile(configPath)
+
+    const newConfigContent = configContent.replace(/productName:.*$/m, `productName: "${productName}",`).replace(/protocol:.*$/m, `protocol: "${name}",`)
+
+    if (newConfigContent !== configContent) {
+          writeFile(newConfigContent, configPath, false)
+    }
+  }
+
 
 function generateAppProps() {
+  
+  const [productName, name] = getProductNameFromPackageJson()
+  writeConfig(productName, name)
+
   const appProps = getAppProps();
-  appProps['productName'] = config.productName
+    appProps['productName'] = productName
   
   if (hasAPI()) {
     // @ts-ignore
