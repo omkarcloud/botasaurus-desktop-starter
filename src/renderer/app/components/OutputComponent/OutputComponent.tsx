@@ -374,7 +374,6 @@ const OutputComponent = (props) => {
   }
   return <> <OutputTabsContainer>
     <ServerStatusComponent />
-    <Description {...props} />
     <Tabs showApiIntegrationTab={props.show_api_integration_tab} onTabChange={((id) => {
       if (id === TabsId.TASKS) {
         onPageChange(1)

@@ -1,6 +1,6 @@
 import ApiIntegrationComponent from '../components/ApiIntegrationComponent/ApiIntegrationComponent';
 import AuthedDashboard from '../components/AuthedDashboard';
-import Description from '../components/Description/Description';
+;
 import Tabs, { TabsId } from '../components/PagesTabs/PagesTabs';
 import Seo from '../components/Seo';
 import { Container, TabWrapper } from '../components/Wrappers';
@@ -15,7 +15,6 @@ const Page = () => {
 
       <AuthedDashboard {...props}>
         <Container>
-          <Description {...props} />
           <Tabs showApiIntegrationTab={true} initialSelectedTab={TabsId.API_INTEGRATION} />
           <TabWrapper>
             <ApiIntegrationComponent {...props} />

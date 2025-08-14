@@ -10,7 +10,7 @@ import { removeSync } from 'botasaurus/utils';
 import { AppUpdater } from './utils/AppUpdater';
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage';
 import { ipcMain } from './utils/ipc-main';
-import { Server } from 'botasaurus-server/server';
+import { Server, createEmailUrl } from 'botasaurus-server/server';
 
 export function getSupportSubMenu(): MenuItemConstructorOptions[] {
   const supportMenuItems: MenuItemConstructorOptions[] = [];
@@ -30,13 +30,11 @@ export function getSupportSubMenu(): MenuItemConstructorOptions[] {
   }
 
   if (Server.emailSupport) {
-    const { email, subject, body } = Server.emailSupport;
+    
     supportMenuItems.push({
       label: 'Contact Support via Email',
       click() {
-        const emailSubject = encodeURIComponent(subject);
-        const emailBody = encodeURIComponent(body);
-        const emailURL = `mailto:${email}?subject=${emailSubject}&body=${emailBody}`;
+        const emailURL = createEmailUrl(Server.emailSupport)
 
         shell.openExternal(emailURL);
       },

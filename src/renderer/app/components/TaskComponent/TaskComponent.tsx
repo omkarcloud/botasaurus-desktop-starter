@@ -343,7 +343,7 @@ const TaskComponent = ({
   return (
     <>
       <OutputTabsContainer>
-        <div className='space-y-6 '>
+        <div className='space-y-6 mt-6 '>
           <Link href={`/tasks`} passHref>
             <EuiLink>View All Tasks</EuiLink>
           </Link>
@@ -360,13 +360,13 @@ const TaskComponent = ({
           
         </div>
 
-        {hasViews(views) ? <div className="pb-6 pt-2">
+        {hasViews(views) ? <div className="pb-6 pt-4">
           <ViewComponent
             view={pageAndView.view}
             setView={handleViewSet}
             views={views}
           />
-        </div> : <div className=' pt-4' />}
+        </div> : <div className=' pt-6' />}
       </OutputTabsContainer>
       
       <OutputContainerWithBottomPadding className={outputContainerClass}>

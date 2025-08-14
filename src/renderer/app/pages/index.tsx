@@ -1,5 +1,5 @@
 import AuthedDashboard from '../components/AuthedDashboard'
-import Description from '../components/Description/Description'
+
 import InputComponent from '../components/InputComponent/InputComponent'
 import Tabs, { TabsId } from '../components/PagesTabs/PagesTabs'
 import Seo from '../components/Seo'
@@ -14,7 +14,6 @@ function Page() {
       <Seo title={'Home'} />
       <AuthedDashboard {...props}>
         <Container>
-          <Description {...props} />
           <Tabs showApiIntegrationTab={props.show_api_integration_tab} initialSelectedTab={TabsId.INPUT} />
           <TabWrapper>
             <InputComponent {...props} />
