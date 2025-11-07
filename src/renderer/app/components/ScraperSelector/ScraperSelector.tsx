@@ -1,6 +1,7 @@
 import { EuiFormRow } from '@elastic/eui/optimize/es/components/form/form_row/form_row';
 
 import ChooseField from '../inputs/ChooseField';
+import Select from '../inputs/Select';
 
 function ScraperSelector({ scrapers, selectedScraper, onSelectScraper }) {
   const options = scrapers.map(scraper => ({
@@ -17,20 +18,31 @@ function ScraperSelector({ scrapers, selectedScraper, onSelectScraper }) {
     }
 
   }
-
   return (
     <EuiFormRow
       className="pb-4"
       label="Choose Scraper"
       display="columnCompressed"
       fullWidth>
+
       <div className="flex flex-row-reverse">
-        <ChooseField
-          name={'choose-scraper'}
-          value={selectedScraper.scraper_name}
-          options={options}
-          onChange={handleChange}
-        />
+        {options.length > 2 ? (
+          <div>
+            <Select
+            name={'choose-scraper'}
+            value={selectedScraper.scraper_name}
+            options={options}
+            onChange={handleChange}
+          />
+          </div>
+        ) : (
+          <ChooseField
+            name={'choose-scraper'}
+            value={selectedScraper.scraper_name}
+            options={options}
+            onChange={handleChange}
+          />
+        )}
       </div>
     </EuiFormRow>
   )

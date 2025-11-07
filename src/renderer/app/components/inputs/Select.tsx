@@ -13,7 +13,6 @@ export default function Select({ options, value, onChange, ...props }: any) {
   return (
     <EuiSelect
       {...props}
-      fullWidth
       options={cleanedOptions}
       value={value}
       onChange={e => {
