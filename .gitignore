@@ -60,3 +60,6 @@ temp.js
 db.nedb
 botasaurus_storage.json
 botasaurus_storage.json.temp
+last_task_id.txt
+# Sentry Config File
+.env.sentry-build-plugin
