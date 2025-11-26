@@ -3,7 +3,7 @@ import { EuiPagination } from '@elastic/eui/optimize/es/components/pagination/pa
 import SingleSelect from './inputs/SingleSelect';
 
 export function Pagination({ total_pages, activePage, onPageClick }) {
-  if (total_pages <= 7) {
+  if (total_pages <= 5) {
     return <EuiPagination
       aria-label={'Pagination'}
       style={{

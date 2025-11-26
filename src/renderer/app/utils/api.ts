@@ -115,6 +115,16 @@ function getUiTaskResults(taskId: number, data: any = {}, force_apply_first_view
     return newLocal
 }
 
+async function getSearchOptions(searchMethod: string, query: string, data: any = {}) {
+    try {
+        const result = await fetch({ route: "getSearchOptions", silent: true }, searchMethod, query, data)
+        return result?.data || { error: 'No data returned' }
+    } catch (error) {
+        console.error('Error fetching search options:', error)
+        return { error: 'Failed to get search options' }
+    }
+}
+
 const Api = {
     openExternal, 
     openInFolder,
@@ -128,6 +138,7 @@ const Api = {
     deleteTask,
     downloadTaskResults,
     getUiTaskResults,
+    getSearchOptions,
 }
 
 export default Api

@@ -4,42 +4,9 @@ import { EuiButtonIcon } from '@elastic/eui/optimize/es/components/button/button
 import { EuiFieldText } from '@elastic/eui/optimize/es/components/form/field_text/field_text';
 import { EuiFlexGroup } from '@elastic/eui/optimize/es/components/flex/flex_group';
 import { EuiFlexItem } from '@elastic/eui/optimize/es/components/flex/flex_item';
-import { EuiModal } from '@elastic/eui/optimize/es/components/modal/modal';
-import { EuiModalBody } from '@elastic/eui/optimize/es/components/modal/modal_body';
-import { EuiModalFooter } from '@elastic/eui/optimize/es/components/modal/modal_footer' ;
-import { EuiModalHeader } from  '@elastic/eui/optimize/es/components/modal/modal_header';
-import { EuiModalHeaderTitle } from  '@elastic/eui/optimize/es/components/modal/modal_header_title';
 import { useState } from 'react';
 import { EuiText } from '@elastic/eui/optimize/es/components/text/text';
-import { isUrl } from '../../utils/missc'
-
-import ClickOutside from '../ClickOutside/ClickOutside';
-import TextAreaField from './TextAreaField';
-
-function isEmpty(x: any) {
-  return (
-    x === null || x === undefined || (typeof x == "string" && x.trim() === "")
-  )
-}
-
-function findLink(inputString) {
-  const regex = /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/;
-  const match = inputString.match(regex);
-  return match ? match[0] : null;
-}
-function getLink(string) {
-  
-  if (isUrl(string)) {
-    return string
-  }
-  return findLink(string)
-}
-
-
-
-function isNotEmpty(x: any) {
-  return !isEmpty(x)
-}
+import BulkEditModal, { getLink, isNotEmpty } from './BulkEditModal';
 
 function isBulkEdit(value, islinks) {
   if (islinks) {
@@ -92,12 +59,13 @@ function isBulkEdit(value, islinks) {
   return (
     <div>
       {showModal && (
-        <Modal
+        <BulkEditModal
           id={id}
           value={value}
           onChangeValue={onChange}
           islinks={islinks}
           closeModal={closeModal}
+          
         />
       )}
       <div
@@ -158,109 +126,3 @@ function isBulkEdit(value, islinks) {
 };
 
 export default ListOfTextFields
-
-function stripChars(input) {
-  // Remove " or ' from the start of the string
-  let result = input.replace(/^[\'\"]+/, '');
-  // Remove , from the end of the string
-  result = result.replace(/,$/, '');
-  // Remove " or ' from the end of the string
-  result = result.replace(/[\'\"]+$/, '');
-  return result;
-}
-
-function parseStringToList(input: string) {
-  input = input.trim();
-
-  // Handle empty string
-  if (input === '') {
-    return [];
-  }
-
-  try {
-      // Try to parse as JSON
-      const jsonList =  JSON.parse(input);
-      if (Array.isArray(jsonList)) {
-        return jsonList.map(x=>`${x}`.trim())
-      }
-  } catch (e) {
-    const split = input.split(/[\n]+/)
-    const lines = split.map(s => stripChars(s.trim()).trim()).filter(isNotEmpty)
-    if (lines.length === 1) {
-      return lines[0].split(/[,]+/).map((s: string) => stripChars(s.trim()).trim()).filter(isNotEmpty)
-    } else {
-      return lines;
-    }
-  }
-}
-
-function computeItemsLen(value:any[], islinks) {
-  
-  if (islinks) {
-    const a = value.map(getLink).filter(x=>x!== null).length
-    return (a > 0 ? ` ${a} `: ' ') + ( islinks ? (a === 1 ? "Link":"Links" ): (a === 1 ?"Item" :"Items"))
-      
-  }else{
-    const a = value.filter(isNotEmpty).length
-    return (a > 0 ? ` ${a} `: ' ') + ( islinks ? (a === 1 ? "Link":"Links" ): (a === 1 ?"Item" :"Items"))
-  
-  }
-  
-}
-
-function Modal({ closeModal, id, value, onChangeValue, islinks }) {
-  const [modaltext, onChangeModalText] = useState(() => {
-
-    if (islinks) {
-      return value.filter(isNotEmpty).map(getLink).filter(x=>x!== null).map(x => x.trim()).join('\n')
-    }else{
-      return value.filter(isNotEmpty).map(x => x.trim()).join('\n')
-    }
-
-    
-  })
-  
-  return <EuiModal onClose={closeModal}>
-    <ClickOutside handleClickOutside={() => { closeModal() } }>
-      <div style={{ minWidth: 720 }}>
-        <EuiModalHeader>
-          <EuiModalHeaderTitle>Paste Items</EuiModalHeaderTitle>
-        </EuiModalHeader>
-        <EuiModalBody>
-        <TextAreaField
-    rows={12}
-    placeholder={
-     islinks ?  `Paste a list of links in one of the following formats:
-     - JSON array (e.g., [\"https://stackoverflow.com/\", \"https://apache.org/\"])
-     - Comma separated (e.g., https://stackoverflow.com/, https://apache.org/)
-     - Newline separated, e.g. 
-          https://stackoverflow.com/
-          https://apache.org/`: `Paste a list of items in one of the following formats:
-      - JSON array (e.g., [\"apple\", \"guava\"])
-      - Comma separated (e.g., apple, guava)
-      - Newline-separated, e.g. 
-          apple
-          guava`}
-    name={id}
-    value={modaltext}
-    onChange={onChangeModalText} />
-            </EuiModalBody>
-        <EuiModalFooter>
-          <EuiButtonEmpty onClick={closeModal}>Cancel</EuiButtonEmpty>
-          <EuiButton onClick={() => {
-            let x = parseStringToList(modaltext)
-            
-            if (islinks){
-              x = x.map(getLink).filter(x=>x!== null)
-            }
-            onChangeValue(x)
-            closeModal()
-          } }>
-            {'Add' + computeItemsLen(parseStringToList(modaltext), islinks) }
-          </EuiButton>
-        </EuiModalFooter>
-
-      </div>
-    </ClickOutside>
-  </EuiModal>
-}

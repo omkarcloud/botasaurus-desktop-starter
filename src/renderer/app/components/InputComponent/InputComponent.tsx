@@ -1,3 +1,4 @@
+import React from 'react'
 import { EuiButton } from '@elastic/eui/optimize/es/components/button/button';
 import { EuiButtonEmpty } from '@elastic/eui/optimize/es/components/button/button_empty/button_empty'
 import { EuiForm } from '@elastic/eui/optimize/es/components/form/form';
@@ -22,6 +23,8 @@ import ListOfTextFields from '../inputs/ListOfTextFields';
 import NumberField from '../inputs/NumberField';
 import SingleSelect from '../inputs/SingleSelect';
 import SearchField from '../inputs/SearchField';
+import SearchSingleSelectApi from '../inputs/SearchSingleSelectApi';
+import SearchMultiSelectApi from '../inputs/SearchMultiSelectApi';
 import SwitchField from '../inputs/SwitchField';
 import TextAreaField from '../inputs/TextAreaField';
 import TextField from '../inputs/TextField';
@@ -223,7 +226,21 @@ const InputFields = ({
             )
             break
             case 'select':
-              inputElement = (
+              const hasSearchMethod = !!(control as any).searchMethod;
+              inputElement = hasSearchMethod ? (
+                <SearchSingleSelectApi
+                  controls={controls}
+                  title={disabledMsg}
+                  isDisabled={disabled}
+                  style={{ maxWidth: '400px' }}
+                  name={id}
+                  value={data[id]}
+                  onChange={value => handleInputChange(id, value)}
+                  searchMethod={(control as any).searchMethod}
+                  canCreateOptions={(control as any).canCreateOptions}
+                  data={data}
+                />
+              ) : (
                 <SingleSelect
                   title={disabledMsg}
                   isDisabled={disabled}
@@ -232,11 +249,27 @@ const InputFields = ({
                   options={options}
                   value={data[id]}
                   onChange={value => handleInputChange(id, value)}
+                  canCreateOptions={(control as any).canCreateOptions}
                 />
               )
               break
               case 'multiSelect':
-                inputElement = (
+                const hasMultiSearchMethod = !!(control as any).searchMethod;
+                inputElement = hasMultiSearchMethod ? (
+                  <SearchMultiSelectApi
+                    controls={controls}
+                    title={disabledMsg}
+                    isDisabled={disabled}
+                    style={{ maxWidth: '400px' }}
+                    name={id}
+                    value={data[id]}
+                    onChange={value => handleInputChange(id, value)}
+                    searchMethod={(control as any).searchMethod}
+                    canCreateOptions={(control as any).canCreateOptions}
+                    canBulkAdd={(control as any).canBulkAdd}
+                    data={data}
+                  />
+                ) : (
                   <InputMultiSelect
                     title={disabledMsg}
                     isDisabled={disabled}
@@ -245,6 +278,8 @@ const InputFields = ({
                     options={options}
                     value={data[id]}
                     onChange={value => handleInputChange(id, value)}
+                    canCreateOptions={(control as any).canCreateOptions}
+                    canBulkAdd={(control as any).canBulkAdd}
                   />
                 )
                 break              
@@ -510,16 +545,18 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
           scraper_name: selectedScraper.scraper_name,
           data: cleanedData,
           enable_cache: enableCache}).finally(() => setIsSubmitting(false))
-        const result = response.data
-        const isarr = Array.isArray(result)
-        if (isarr && result.length === 0) {
-          Toast.error('No Tasks were created.')
-        }else {
-          const outputId = isarr ? result[0].id : result.id
-          if (outputId) {
-          pushToRoute(router, `/tasks/${outputId}`)
-          } else {
-            console.error("failed", result)
+        if (response) {
+          const result = response.data
+          const isarr = Array.isArray(result)
+          if (isarr && result.length === 0) {
+            Toast.error('No Tasks were created.')
+          }else {
+            const outputId = isarr ? result[0].id : result.id
+            if (outputId) {
+            pushToRoute(router, `/tasks/${outputId}`)
+            } else {
+              console.error("failed", result)
+            }
           }
         }        
         } catch (error:any) {

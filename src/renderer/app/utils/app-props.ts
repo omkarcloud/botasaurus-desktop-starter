@@ -11,7 +11,7 @@ export const appProps = {
             "name": "Scrape Heading Task",
             "scraper_name": "scrapeHeadingTask",
             "route_path": "scrape-heading-task",
-            "input_js_hash": "69fc72f1db61af05ec70a6f385e8591a",
+            "input_js_hash": "2c42664323ab39f2c6e22295f33399fa",
             "filters": [],
             "sorts": [
                 {

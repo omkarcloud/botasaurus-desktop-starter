@@ -24,7 +24,7 @@ const ContentContainer = ({ selectedScraper, hasSingleScraper , enable_cache}: {
   )
 
   //@ts-ignore
-  const defdata = controls.getDefaultData()
+  const defdata = controls.getParsedControlData(controls.getDefaultData())
 
   const readmeContent = createApiREADME(baseUrl, selectedScraper.scraper_name,hasSingleScraper, defdata, sorts, filters, views, default_sort, selectedScraper.route_path, selectedScraper.max_runs, getApiBasePath(), getRouteAliases()[selectedScraper.scraper_name] ?? [], enable_cache)
   return <MarkdownComponent content={readmeContent} />

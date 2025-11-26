@@ -217,7 +217,7 @@ function runApp(onQuit, onWindowMade) {
         }
 
         await onClose()
-        await onQuit()
+        await onQuit?.()
       })
     })
     .catch(console.log)
@@ -248,8 +248,8 @@ function runAppWithoutWindow(onQuit, onReady) {
             powerSaveBlocker.stop(powerSaveId)
           }
         }
-        await onQuit()
         await onClose()
+        await onQuit?.()
         
       })
     })
