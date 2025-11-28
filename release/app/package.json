@@ -1,6 +1,6 @@
 {
   "name": "todo-my-app-name",
-  "version": "1.24.0",
+  "version": "1.25.0",
   "description": "Todo my app description",
   "license": "MIT",
   "main": "./dist/main/main.js",
