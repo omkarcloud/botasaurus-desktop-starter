@@ -153,9 +153,6 @@ const createWindow = async (onWindowMade, runFn) => {
     return { action: 'deny' }
   })
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  AppUpdater.init()
 }
 
 async function initDbAndExecutor(onReady) {

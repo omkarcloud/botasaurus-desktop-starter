@@ -182,8 +182,8 @@ function joinStrings(strings: string[], separator: string = 'or'): string {
   } else if (strings.length === 1) {
     return strings[0]
   } else {
-    const lastElement = strings.pop()
-    const joinedStrings = strings.join(", ")
+    const lastElement = strings[strings.length - 1]
+    const joinedStrings = strings.slice(0, -1).join(", ")
     return `${joinedStrings} ${separator} ${lastElement}`
   }
 }

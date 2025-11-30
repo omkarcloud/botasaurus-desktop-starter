@@ -1,6 +1,5 @@
 import ApiIntegrationComponent from '../components/ApiIntegrationComponent/ApiIntegrationComponent';
 import AuthedDashboard from '../components/AuthedDashboard';
-;
 import Tabs, { TabsId } from '../components/PagesTabs/PagesTabs';
 import Seo from '../components/Seo';
 import { Container, TabWrapper } from '../components/Wrappers';
