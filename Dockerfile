@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim
+FROM node:20
 
 ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:99
@@ -44,9 +44,9 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY package*.json ./
+COPY . .
 RUN npm install
 
-COPY . .
 
 EXPOSE 8000
 

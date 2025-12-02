@@ -67,3 +67,6 @@ last_task_id.txt
 *.DS_Store
 **/__pycache__
 **/.DS_Store
+
+release/app/node_modules
+release/app/dist
