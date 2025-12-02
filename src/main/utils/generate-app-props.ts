@@ -7,7 +7,24 @@ import { getAppProps } from 'botasaurus-server/task-routes';
 import { isDev } from 'botasaurus-server/env';
 import { hasAPI } from './electron-utils'
 
-  function makeScraperToInputJs(appProps: { scrapers: any[] }) {
+/**
+ * Check if a JavaScript string has valid syntax using Function constructor
+ * @param {string} codeString - The JavaScript code to validate
+ * @param {boolean} strictMode - Whether to check in strict mode
+ * @returns {{isValid: boolean, error?: Error, errorDetails?: object}}
+ */
+function isValidJavaScriptSyntaxFunction(codeString) {
+  try {
+    const code = `"use strict";\nconst a =${codeString}`;
+    // Create a function without calling it
+    new Function(code);
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+  function makeScraperToInputJs(appProps: { scrapers: any[] }): [string, boolean] {
     let scraperToInputJs = ''
     appProps.scrapers.forEach(scraper => {
       scraperToInputJs += `\n    "${scraper.scraper_name}": (controls) => {
@@ -19,15 +36,20 @@ ${scraper.input_js}
       delete scraper['input_js']
     })
 
+    const asObject = `{${scraperToInputJs}\n};`
+
+
+
     // Wrap in module export
-    scraperToInputJs = `export default {${scraperToInputJs}\n};`
-    return scraperToInputJs
+    const isValid = isValidJavaScriptSyntaxFunction(asObject)
+    scraperToInputJs = `export default ${asObject}`
+    return [scraperToInputJs, isValid]
   }
 
 
 function writeFiles(scraperToInputJs: string) {
   const rendererScraperPath = path.join(
-    __dirname,
+    __dirname,'../../',
     'src/renderer/app/utils/scraper-to-input-js.ts'
   )
   const currentRendererScraperContents = readFile(rendererScraperPath)
@@ -38,7 +60,7 @@ function writeFiles(scraperToInputJs: string) {
 
   // Write scraperToInputJs file to main process
   const mainScraperPath = path.join(
-    __dirname,
+    __dirname,'../../',
     'src/main/utils/scraper-to-input-js.ts'
   )
   const currentMainScraperContents = readFile(mainScraperPath)
@@ -60,7 +82,7 @@ function writeConfig(productName: any, name: any) {
    * @param name - The protocol name to set in the config.
    */
     
-    const configPath = path.join(__dirname, 'src/main/config.ts')
+    const configPath = path.join(__dirname,'../../', 'src/main/config.ts')
     const configContent = readFile(configPath)
 
     const newConfigContent = configContent.replace(/productName:.*$/m, `productName: "${productName}",`).replace(/protocol:.*$/m, `protocol: "${name}",`)
@@ -72,9 +94,8 @@ function writeConfig(productName: any, name: any) {
 
 
 function generateAppProps() {
-  
   const [productName, name] = getProductNameFromPackageJson()
-  writeConfig(productName, name)
+  
 
   const appProps = getAppProps();
     appProps['productName'] = productName
@@ -85,7 +106,13 @@ function generateAppProps() {
   }
 
   // Build scraperToInputJs string
-  let scraperToInputJs = makeScraperToInputJs(appProps)
+  let [scraperToInputJs, isInputJsValid] = makeScraperToInputJs(appProps)
+
+  if (!isInputJsValid){
+    return
+  }
+
+  
 
   // Write scraperToInputJs file to renderer process
   writeFiles(scraperToInputJs)
@@ -94,22 +121,18 @@ function generateAppProps() {
     ? JSON.stringify(appProps, null, 4)
     : JSON.stringify(appProps);
 
-  // const content = "export const appProps:any = " + config
   const content = `export const appProps = ${props}`;
 
   const outputFilePath = path.join(
-    __dirname,
+    __dirname,'../../',
     'src/renderer/app/utils/app-props.ts',
   );
-  // const outputFilePath = path.join(__dirname, "../../", "src/renderer/index.ejs")
   const currentContents = readFile(outputFilePath);
 
   if (currentContents !== content) {
     writeFile(content, outputFilePath, false);
-    console.log('Updated');
-  } else {
-    console.log('No Update');
   }
+  writeConfig(productName, name)
 }
 
 export { generateAppProps };

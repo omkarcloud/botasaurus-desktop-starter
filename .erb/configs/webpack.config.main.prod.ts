@@ -6,7 +6,7 @@ import path from 'path';
 import webpack from 'webpack';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import { getAnalyzerPlugins } from './getAnalyzerPlugins';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
@@ -51,10 +51,7 @@ const configuration: webpack.Configuration = {
 
   plugins: [
     ...prodMainCopyPlugins,
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
-      analyzerPort: 8888,
-    }),
+    ...getAnalyzerPlugins(),
 
     /**
      * Create global constants which can be configured at compile time.

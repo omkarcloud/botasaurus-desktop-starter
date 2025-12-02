@@ -37,7 +37,7 @@ export default function SearchMultiSelect({
 
   const selected = (value ?? []).map(tgt => {
     if (typeof tgt === "string") {
-      return options.find(x => x.value === tgt) || { value: tgt, label: tgt }
+      return options.find(x => x.value === tgt) ?? { value: tgt, label: tgt }
     } else if (typeof tgt === "object" && tgt.value) {
       return tgt
     }

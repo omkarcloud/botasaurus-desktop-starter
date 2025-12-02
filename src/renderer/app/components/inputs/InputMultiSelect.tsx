@@ -15,7 +15,7 @@ export default function InputMultiSelect({
 
   const selected = (value ?? []).map(tgt=>{
     if (typeof tgt ==="string") {
-      return options.find(x => x.value === tgt)
+      return options.find(x => x.value === tgt) ?? { value: tgt, label: tgt }
     }
     return tgt
   }).filter(x=> !!x)
@@ -27,7 +27,8 @@ export default function InputMultiSelect({
       return
     }
 
-    onChange([...(value ?? []), normalizedSearchValue])
+    const result = [...(value ?? []), normalizedSearchValue]
+    onChange(result)
   }
 
   const handleBulkChange = (newItems: string[]) => {

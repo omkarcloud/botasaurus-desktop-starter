@@ -12,13 +12,15 @@
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "prepare": "husky",
     "postinstall": "npm run fix:header-generator && npm run fix:nedb && npm run fix:playwright && ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && npm run build:dll",
-    "package": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build -c.mac.identity=null --publish never && npm run build:dll",
-    "package:mac-signed": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
-    "package:publish": "webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish always && npm run build:dll",
+    "package": "cross-env GENERATE_APP_PROPS=true webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build -c.mac.identity=null --publish never && npm run build:dll",
+    "package:mac-signed": "cross-env GENERATE_APP_PROPS=true webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never && npm run build:dll",
+    "package:publish": "cross-env GENERATE_APP_PROPS=true webpack --config ./.erb/configs/webpack.config.main.dev.ts && ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish always && npm run build:dll",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "prestart": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.dev.ts",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
     "dev": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && npm run start:renderer",
+    "k8s:worker": "npm run prestart && npm run start:main:worker",
+    "k8s:master": "ts-node ./.erb/scripts/check-port-in-use.js && npm run prestart && cross-env K8S_MODE=master npm run start:renderer",
     "fix:playwright": "rimraf --glob ./node_modules/rebrowser-playwright-core/lib/vite/recorder/assets/*.css ./node_modules/rebrowser-playwright-core/lib/vite/recorder/assets/*.ttf node_modules/rebrowser-playwright-core/lib/vite/recorder/index.html node_modules/rebrowser-playwright-core/lib/vite/recorder/playwright-logo.svg node_modules/rebrowser-playwright-core/lib/server/chromium/appIcon.png && ts-node  ./.erb/scripts/fix-playwright.js",
     "fix:nedb": "ts-node  ./.erb/scripts/fix-nedb.js",
     "fix:header-generator": "ts-node  ./.erb/scripts/fix-header-generator.js",
@@ -27,6 +29,8 @@
     "clean:db": "rimraf output/ error_logs/ task_results/ db.nedb",
     "update": "npm update botasaurus botasaurus-controls botasaurus-server",
     "start:main": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon .\"",
+    "start:main:worker": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon . --worker\"",
+    "start:main:master": "concurrently -k \"cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --watch --config ./.erb/configs/webpack.config.main.dev.ts\" \"electronmon . --master\"",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "cross-env NODE_ENV=development nodemon --watch src --watch test --ext ts,tsx,json --exec 'webpack --config ./.erb/configs/webpack.config.test.dev.ts && node .erb/dll/test.bundle.dev.js'"
@@ -135,7 +139,8 @@
     "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
-    "webpack-merge": "^5.9.0"
+    "webpack-merge": "^5.9.0",
+    "webpack-watch-files-plugin": "^1.2.1"
   },
   "build": {
     "productName": "Todo My App Name",

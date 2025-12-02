@@ -6,7 +6,7 @@ import path from 'path';
 import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import { getAnalyzerPlugins } from './getAnalyzerPlugins';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
@@ -50,7 +50,7 @@ const configuration: webpack.Configuration = {
               importLoaders: 1,
             },
           },
-          'sass-loader',
+          // 'sass-loader',  // no need as no sass files, and throws warnings
         ],
         include: /\.module\.s?(c|a)ss$/,
       },
@@ -59,19 +59,18 @@ const configuration: webpack.Configuration = {
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
-          'sass-loader',
           {
             loader: 'postcss-loader',
             options: {
-            postcssOptions: {
-              plugins:
-                [
+              postcssOptions: {
+                plugins: [
                   require('tailwindcss'),
                   require('autoprefixer'),
                 ]
               },
             },
           },
+          // 'sass-loader',  // no need as no sass files, and throws warnings
         ],
         exclude: /\.module\.s?(c|a)ss$/,
       },
@@ -132,10 +131,7 @@ const configuration: webpack.Configuration = {
       filename: 'style.css',
     }),
 
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
-      analyzerPort: 8889,
-    }),
+    ...getAnalyzerPlugins(),
 
     new HtmlWebpackPlugin({
       filename: 'index.html',

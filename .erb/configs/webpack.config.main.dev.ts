@@ -4,19 +4,49 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import { merge } from 'webpack-merge';
 import checkNodeEnv from '../scripts/check-node-env';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import { devMainCopyPlugins } from './copy-plugin'
-import { LogContentsPlugin } from './webpack.custom-plugins'
+import { GenerateApiPropsPlugin } from './webpack.custom-plugins'
+import { getAnalyzerPlugins } from './getAnalyzerPlugins'
+import WatchExternalFilesPlugin from 'webpack-watch-files-plugin'
+import touch from 'touch';
 
+
+class WebpackForceRebuildOnEmitPlugin {
+  apply(compiler) {
+    compiler.hooks.emit.tapAsync('WebpackForceRebuildOnEmitPlugin', (compilation, callback) => {
+      const outputPath = compilation.outputOptions.path;
+      const firstAssetName = compilation.getAssets()[0].name;
+      const assetToTouch = path.resolve(outputPath, firstAssetName);
+      touch(assetToTouch);
+      callback();
+    });
+  }
+}
+
+
+function getWatchingPlugins() {
+  const IS_WATCH_MODE = process.argv?.includes('--watch');
+  return IS_WATCH_MODE ? [
+    // @ts-ignore
+    new WatchExternalFilesPlugin({
+      verbose: false,
+      files: [
+        './inputs/**/*.js',
+      ]
+    }) as any,
+    new WebpackForceRebuildOnEmitPlugin(),
+  ] : []
+}
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
   checkNodeEnv('development');
 }
+const generateApiProps = process.env.GENERATE_APP_PROPS === 'true';
 const configuration: webpack.Configuration = {
   devtool: 'inline-source-map',
 
@@ -39,13 +69,11 @@ const configuration: webpack.Configuration = {
 
   plugins: [
     ...devMainCopyPlugins,
-    new LogContentsPlugin(),
+    ...(generateApiProps ? [new GenerateApiPropsPlugin()] : []),
+    ...getWatchingPlugins(),
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
-      analyzerPort: 8888,
-    }),
+    ...getAnalyzerPlugins(),
 
     new webpack.DefinePlugin({
       'process.type': '"browser"',

@@ -25,27 +25,46 @@ import { Server } from 'botasaurus-server/server';
 import { AppUpdater } from './utils/AppUpdater'
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage'
 import { ipcMain } from './utils/ipc-main'
+import { config } from './config'
 
-// Get all command line arguments
 let powerSaveId;
 
-if (process.env.CREATE_API_CONFIG) {
-  generateAppProps();
-} else {
-  const gotTheLock = app.requestSingleInstanceLock();
-  if (!gotTheLock) {
-    app.quit();
-  } else {
-    runAppAndApi()
+
+function main() {
+
+  if (config.isDev) {
+    generateAppProps();
   }
+
+  if (!app) {
+    return;
+  }
+
+  const gotTheLock = app.requestSingleInstanceLock();
+  const apiArgs = getApiArgs()
+
+  if (gotTheLock) {
+    runAppAndApi(apiArgs)
+    return;
+  }
+
+  if (apiArgs.isWorker) {
+    console.log('[APP] App already running, starting in Worker mode, without Api')
+    initDbAndExecutor(null)
+    return;
+  }
+
+  console.log('[APP] App already running, closing this instance')
+  app.quit();
 }
+main()
 
 function closeServerOnExit() {
 
-function exitHandler(options, exitCode) {
+function exitHandler(options) {
   if (options.cleanup) {
     stopServer()
-  };
+  }
   if (options.exit) process.exit();
 }
 
@@ -64,17 +83,26 @@ process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
   
 }
 
-function runAppAndApi() {
-  
+function runAppAndApi(apiArgs: ReturnType<typeof getApiArgs>) {
+  const { port, onlyRunApi, hasServerArguments, apiBasePath, isWorker, isMaster} = apiArgs
   const API = getAPI()
-  let { port, onlyRunApi, hasServerArguments, apiBasePath} = getApiArgs()
+  
   let finalPORT:number
   let onQuit
+
+  if ((isWorker || isMaster) && !API) {
+    throw new Error(
+`The API is not enabled in "api-config.ts".
+To enable it:
+1. Follow the instructions at:
+   https://www.omkar.cloud/botasaurus/docs/botasaurus-desktop/botasaurus-desktop-api/adding-api#how-to-add-an-api-to-your-app`
+    );
+  }
   if (API) {
     finalPORT = port || API.apiPort
     onQuit = stopServer
 
-    if (API.apiOnlyMode || onlyRunApi ) {
+    if (API.apiOnlyMode || onlyRunApi || isWorker) {
        
        return runAppWithoutWindow(onQuit, () => {
         closeServerOnExit()
@@ -135,8 +163,8 @@ const createWindow = async (onWindowMade, runFn) => {
     } else {
       getWindow().show()
     }
-    runFn?.()
     onWindowMade?.()
+    runFn?.()
   })
 
   mainWindow.on('closed', () => {
@@ -155,6 +183,8 @@ const createWindow = async (onWindowMade, runFn) => {
 
 }
 
+
+
 async function initDbAndExecutor(onReady) {
   
       await initAutoIncrementDb()
@@ -165,11 +195,22 @@ async function initDbAndExecutor(onReady) {
         await onReady()  
       }
       
+      checkMasterHealth()
       // Remove this if your app does not use auto updates
       // eslint-disable-next-line
       AppUpdater.init()
   
 }
+/*
+  If in K8s, check if the master is healthy
+  If the master is not healthy, app will exit
+*/
+function checkMasterHealth() {
+  if (global.checkMasterHealth) {
+    global.checkMasterHealth()
+  }
+}
+
 function runApp(onQuit, onWindowMade) {
   registerDeepLinkProtocol()
   app.on('second-instance', (event, commandLine, workingDirectory) => {

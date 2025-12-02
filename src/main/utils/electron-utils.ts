@@ -78,34 +78,45 @@ export function getApiArgs() {
   let onlyRunApi = false;
   let hasServerArguments = false;
   let apiBasePath: string  = '';
+  let isWorker: boolean  = false;
+  let isMaster: boolean  = false;
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--port') {
-      hasServerArguments = true;
-      if (i + 1 < args.length) {
-        try {
-          port = parseInt(args[i + 1]);
-          if (port > 1) {
+    switch (args[i]) {
+      case '--port':
+        hasServerArguments = true;
+        if (i + 1 < args.length) {
+          const parsed = parseInt(args[i + 1], 10);
+          if (!isNaN(parsed) && parsed > 1) {
+            port = parsed;
             i++;
           }
-        } catch (error) {
-          console.error(port);
         }
-      }
-    } else if (args[i] === '--only-start-api') {
-      hasServerArguments = true;
-      onlyRunApi = true;
-    } else if (args[i] === '--api-base-path') {
-      hasServerArguments = true;
-      if (i + 1 < args.length) {
-        if (args[i + 1]) {
-          apiBasePath = cleanBasePath(args[i + 1]) as any  
+        break;
+      case '--only-start-api':
+        hasServerArguments = true;
+        onlyRunApi = true;
+        break;
+      case '--api-base-path':
+        hasServerArguments = true;
+        if (i + 1 < args.length) {
+          if (args[i + 1]) {
+            apiBasePath = cleanBasePath(args[i + 1]) as any  
+          }
+          i++;
         }
-        i++;
-      }
+        break;
+      case '--worker':
+        hasServerArguments = true;
+        isWorker = true;
+        break;
+      case '--master':
+        hasServerArguments = true;
+        isMaster = true;
+        break;
     }
   }
-  return { port, onlyRunApi, hasServerArguments, apiBasePath};
+  return { port, onlyRunApi, hasServerArguments, apiBasePath, isWorker, isMaster};
 }
 
 
