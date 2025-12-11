@@ -23,7 +23,7 @@ export function addRoutesHandler() {
           return pickId(result)
         }
 
-        return result.slice(0, 1).map(pickId)
+        return [pickId(result[1] ?? result[0])]
       })
     } else {
       // @ts-ignore

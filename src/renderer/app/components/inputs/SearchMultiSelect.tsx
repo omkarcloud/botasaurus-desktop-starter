@@ -32,7 +32,7 @@ export default function SearchMultiSelect({
     lastQueries[key] = query
 
     await fetchAndSetOptions(setIsLoading, fetchOptions, query, setOptions)
-  }, [props.name])
+  }, [props.name, fetchOptions])
 
 
   const selected = (value ?? []).map(tgt => {

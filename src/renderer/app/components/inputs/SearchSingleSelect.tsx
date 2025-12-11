@@ -20,7 +20,6 @@ export async function fetchAndSetOptions(setIsLoading, fetchOptions: any, query:
     const error_message = error.message ?? error.error ?? error.response?.data?.error ?? error.response?.data?.message
     if (error_message) {
       Toast.error(error_message)
-      setOptions([])
     }
     setOptions([])
   } finally {
@@ -52,7 +51,7 @@ export default function SearchSingleSelect({
     lastQueries[key] = query
 
     await fetchAndSetOptions(setIsLoading, fetchOptions, query, setOptions)
-  }, [props.name])
+  }, [props.name, fetchOptions])
 
   const debouncedOnSearchChange = useCallback(
     debounce((newValue) => {

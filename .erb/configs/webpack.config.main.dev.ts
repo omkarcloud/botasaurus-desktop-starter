@@ -11,22 +11,7 @@ import webpackPaths from './webpack.paths';
 import { devMainCopyPlugins } from './copy-plugin'
 import { GenerateApiPropsPlugin } from './webpack.custom-plugins'
 import { getAnalyzerPlugins } from './getAnalyzerPlugins'
-import WatchExternalFilesPlugin from 'webpack-watch-files-plugin'
-import touch from 'touch';
-
-
-class WebpackForceRebuildOnEmitPlugin {
-  apply(compiler) {
-    compiler.hooks.emit.tapAsync('WebpackForceRebuildOnEmitPlugin', (compilation, callback) => {
-      const outputPath = compilation.outputOptions.path;
-      const firstAssetName = compilation.getAssets()[0].name;
-      const assetToTouch = path.resolve(outputPath, firstAssetName);
-      touch(assetToTouch);
-      callback();
-    });
-  }
-}
-
+import WatchExternalFilesPlugin from './webpack-watch-files-plugin'
 
 function getWatchingPlugins() {
   const IS_WATCH_MODE = process.argv?.includes('--watch');
@@ -36,9 +21,8 @@ function getWatchingPlugins() {
       verbose: false,
       files: [
         './inputs/**/*.js',
-      ]
+      ], 
     }) as any,
-    new WebpackForceRebuildOnEmitPlugin(),
   ] : []
 }
 // When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's

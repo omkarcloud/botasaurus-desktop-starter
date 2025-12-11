@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import Api from '../../utils/api'
 import SearchMultiSelect from './SearchMultiSelect'
 
@@ -13,6 +13,6 @@ export default function SearchMultiSelectApi({
   data = {},
   ...props
 }: any) {
-  const fetchOptions = (query) => Api.getSearchOptions(searchMethod, query, controls.getParsedControlData(data))
+  const fetchOptions = useCallback((query) => Api.getSearchOptions(searchMethod, query, controls.getParsedControlData(data)), [searchMethod, controls, data])
   return <SearchMultiSelect value={value} onChange={onChange} canCreateOptions={canCreateOptions} fetchOptions={fetchOptions} {...props} />
 }

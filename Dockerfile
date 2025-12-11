@@ -3,24 +3,6 @@ FROM node:20
 ENV DEBIAN_FRONTEND=noninteractive \
     DISPLAY=:99
 
-# Install system dependencies
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     wget \
-#     git \
-#     lsof \
-#     xvfb \
-#     gnupg \
-#     ca-certificates \
-#     && rm -rf /var/lib/apt/lists/*
-
-# Install Chromium (works on both AMD64 and ARM64)
-# RUN apt-get update \
-#     && apt-get install -y --no-install-recommends chromium \
-#     && rm -rf /var/lib/apt/lists/* \
-#     && ln -sf /usr/bin/chromium /usr/bin/google-chrome-stable \
-#     && ln -sf /usr/bin/chromium /usr/bin/google-chrome
-
-
 # # Install Chrome dependencies
 RUN apt-get update && apt-get install -y \
     wget \
@@ -44,8 +26,12 @@ RUN apt-get update && apt-get install -y google-chrome-stable \
 WORKDIR /app
 
 COPY package*.json ./
-COPY . .
+COPY tsconfig.json ./
+COPY release/ ./release/
+COPY .erb/ ./.erb/
+
 RUN npm install
+COPY . .
 
 
 EXPOSE 8000

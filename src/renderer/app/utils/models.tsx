@@ -42,6 +42,6 @@ export function filterIsProgressTasks(tasks: any[]) {
 }
 
 
-export function filterAndMapAllTasks(tasks: any[]) {
-  return tasks.filter(x=> x.is_all_task === true && isDoing(x) ).map(x=> ({id: x.id, result_count: x.result_count}))
+export function filterAndMapAllOrInProgressTasks(tasks: any[]) {
+  return tasks.filter(x=> isDoing(x)  && (x.is_all_task ||isInProgress(x))).map(x=> ({id: x.id, result_count: x.result_count}))
 }

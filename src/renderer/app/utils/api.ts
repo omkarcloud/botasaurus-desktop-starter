@@ -97,6 +97,13 @@ function deleteTask(task_id: number, page: number) {
     })
 }
 
+function retryTask(task_id: number, page: number) {
+    return fetch({ route: "patchTask", message: 'Retrying...' }, { page }, {
+        action: 'retry',
+        task_ids: [task_id]
+    })
+}
+
 function downloadTaskResults(taskId: number, data: any = {}) {
     return fetch({ route: "downloadTaskResults", message: 'Downloading...' }, taskId, data)
 }
@@ -136,6 +143,7 @@ const Api = {
     isTaskUpdated,
     abortTask,
     deleteTask,
+    retryTask,
     downloadTaskResults,
     getUiTaskResults,
     getSearchOptions,

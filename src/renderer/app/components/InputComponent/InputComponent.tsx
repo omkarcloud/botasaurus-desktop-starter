@@ -27,6 +27,7 @@ import SearchSingleSelectApi from '../inputs/SearchSingleSelectApi';
 import SearchMultiSelectApi from '../inputs/SearchMultiSelectApi';
 import SwitchField from '../inputs/SwitchField';
 import TextAreaField from '../inputs/TextAreaField';
+import JsonTextAreaField from '../inputs/JsonTextAreaField';
 import TextField from '../inputs/TextField';
 import { useRouter } from '../Link';
 import ScraperSelector from '../ScraperSelector/ScraperSelector';
@@ -166,6 +167,18 @@ const InputFields = ({
           case 'textarea':
             inputElement = (
               <TextAreaField
+                title={disabledMsg}
+                disabled={disabled}
+                placeholder={(control as any).placeholder}
+                name={id}
+                value={data[id]}
+                onChange={value => handleInputChange(id, value)}
+              />
+            )
+            break
+          case 'jsonTextArea':
+            inputElement = (
+              <JsonTextAreaField
                 title={disabledMsg}
                 disabled={disabled}
                 placeholder={(control as any).placeholder}
@@ -537,13 +550,11 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
     e?.preventDefault()
     setSubmitAttempted(true)
     if (isEmptyObject(validationResult)) {
-      // @ts-ignore
-      const cleanedData = controls.getBackendValidationResult(data)['data']
       setIsSubmitting(true)
       try {
         const response = await Api.createAsyncTask({
           scraper_name: selectedScraper.scraper_name,
-          data: cleanedData,
+          data,
           enable_cache: enableCache}).finally(() => setIsSubmitting(false))
         if (response) {
           const result = response.data
