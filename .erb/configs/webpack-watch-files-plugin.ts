@@ -59,7 +59,6 @@ class WebpackWatchPlugin {
         if (this.verbose && !this.filesAlreadyAdded) {
           console.log('Additional files watched:', JSON.stringify(files, null, 2));
         }
-        console.log({ files });
 
         files.forEach((file) => {
           compilation.fileDependencies.add(file);
