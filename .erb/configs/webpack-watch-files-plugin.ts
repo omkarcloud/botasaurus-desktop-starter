@@ -34,27 +34,20 @@ class WebpackWatchPlugin {
         const filesFoundToExclude: string[] = [];
 
         for (const pattern of this.files) {
-          if (pattern.substr(0, 1) !== '!') {
+          if (pattern[0] !== '!') {
             glob.sync(pattern, this.globOptions).forEach((file) => {
               filesFound.push(file);
             });
           } else {
-            glob.sync(pattern.substr(1), this.globOptions).forEach((file) => {
+            glob.sync(pattern.slice(1), this.globOptions).forEach((file) => {
               filesFoundToExclude.push(file);
             });
           }
         }
 
-        const files = (
-          (
-            filesFound.map((file) => {
-              if (filesFoundToExclude.indexOf(file) !== -1) {
-                return null;
-              }
-              return file;
-            })
-          )
-        ).filter((file) => file !== null).map((file) => resolve(file));
+        const files = filesFound
+          .filter((file) => !filesFoundToExclude.includes(file))
+          .map((file) => resolve(file));
 
         if (this.verbose && !this.filesAlreadyAdded) {
           console.log('Additional files watched:', JSON.stringify(files, null, 2));

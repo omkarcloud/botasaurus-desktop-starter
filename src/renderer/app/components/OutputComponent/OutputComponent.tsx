@@ -3,7 +3,6 @@ import { EuiBasicTable } from '@elastic/eui/optimize/es/components/basic_table/b
 import { EuiBasicTableColumn } from '@elastic/eui/optimize/es/components/basic_table/basic_table';
 import { EuiButton } from '@elastic/eui/optimize/es/components/button/button';
 import { EuiButtonEmpty } from '@elastic/eui/optimize/es/components/button/button_empty/button_empty';
-import { EuiButtonIcon } from '@elastic/eui/optimize/es/components/button/button_icon/button_icon';
 import { EuiFlexGroup } from '@elastic/eui/optimize/es/components/flex/flex_group';
 import { EuiFlexItem } from '@elastic/eui/optimize/es/components/flex/flex_item';
 import { EuiLink } from '@elastic/eui/optimize/es/components/link';
@@ -234,15 +233,6 @@ const TaskTable = ({
             {isFailed && (
               <EuiFlexItem grow={false}>
                 <RefreshIcon onClick={() => retryTask(task)} ariaLabel="Retry task" />
-                <EuiButtonIcon
-                  iconType="refresh"
-                  aria-label="Retry task"
-                  color="primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    retryTask(task);
-                  }}
-                />
               </EuiFlexItem>
             )}
           </EuiFlexGroup>
