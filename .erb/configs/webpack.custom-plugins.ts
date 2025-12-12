@@ -1,40 +1,34 @@
 import { writeFile } from "botasaurus/output"
 import { exec } from 'child_process'
-import * as path from 'path'
 import * as fs from 'fs'
-
-function ensureDllDirExists(): void {
-  const dllDir = path.join(__dirname, "../dll/")
-  if (!fs.existsSync(dllDir)) {
-    fs.mkdirSync(dllDir, { recursive: true })
-  }
-}
+import * as path from 'path';
 
 function getTempPath(): string {
-  return path.join(__dirname, "../dll/", "temp.js")
+  return path.join(process.cwd(), 'temp.js')
 }
 
-
-
-function runCode(contents) {
-  ensureDllDirExists()
+function runCode(contents:string) {
   writeFile(contents, getTempPath(), false)
 
-  exec('node ./.erb/dll/temp.js', (error, stdout, stderr) => {
+  exec('node ./temp.js', (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing temp.js: ${error}`)
-      return
     }
     if (stderr) {
       console.error(`stderr: ${stderr}`)
-      process.exit(1)
+    }
+    // Delete temp file after execution
+    try {
+      fs.unlinkSync(getTempPath())
+    } catch (e) {
+      // Ignore delete errors
     }
   })
 }
 
 export class GenerateApiPropsPlugin {
-  apply(compiler) {
-    compiler.hooks.emit.tapAsync('GenerateApiPropsPlugin', async (compilation, callback) => {
+  apply(compiler:any) {
+    compiler.hooks.emit.tapAsync('GenerateApiPropsPlugin', async (compilation:any, callback:any) => {
  const compAssets = compilation.assets
   for (const assetName in compAssets) {
         const targetFiles = ["main.bundle.dev.js"]

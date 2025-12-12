@@ -1,11 +1,13 @@
 import fs from 'fs';
-import '../../scraper/backend/server';
 import '../../scraper/backend/api-config';
+import '../../scraper/backend/server';
 import * as path from 'path';
 import { writeFile, readFile } from 'botasaurus/output';
 import { getAppProps } from 'botasaurus-server/task-routes';
 import { isDev } from 'botasaurus-server/env';
 import { hasAPI } from './electron-utils'
+
+const getSrcRoot = process.cwd;
 
 /**
  * Check if a JavaScript string has valid syntax using Function constructor
@@ -49,7 +51,7 @@ ${scraper.input_js}
 
 function writeFiles(scraperToInputJs: string) {
   const rendererScraperPath = path.join(
-    __dirname,'../../',
+    getSrcRoot(),
     'src/renderer/app/utils/scraper-to-input-js.ts'
   )
   const currentRendererScraperContents = readFile(rendererScraperPath)
@@ -60,7 +62,7 @@ function writeFiles(scraperToInputJs: string) {
 
   // Write scraperToInputJs file to main process
   const mainScraperPath = path.join(
-    __dirname,'../../',
+    getSrcRoot(),
     'src/main/utils/scraper-to-input-js.ts'
   )
   const currentMainScraperContents = readFile(mainScraperPath)
@@ -82,7 +84,7 @@ function writeConfig(productName: any, name: any) {
    * @param name - The protocol name to set in the config.
    */
     
-    const configPath = path.join(__dirname,'../../', 'src/main/config.ts')
+    const configPath = path.join(getSrcRoot(), 'src/main/config.ts')
     const configContent = readFile(configPath)
 
     const newConfigContent = configContent.replace(/productName:.*$/m, `productName: "${productName}",`).replace(/protocol:.*$/m, `protocol: "${name}",`)
@@ -124,7 +126,7 @@ function generateAppProps() {
   const content = `export const appProps = ${props}`;
 
   const outputFilePath = path.join(
-    __dirname,'../../',
+    getSrcRoot(),
     'src/renderer/app/utils/app-props.ts',
   );
   const currentContents = readFile(outputFilePath);
