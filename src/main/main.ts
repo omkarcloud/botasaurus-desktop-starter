@@ -1,5 +1,5 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
-import './config'
+import { config } from './config'
 import { generateAppProps } from './utils/generate-app-props'
 import { app, BrowserWindow, powerSaveBlocker, shell } from 'electron'
 import path from 'path'
@@ -25,7 +25,6 @@ import { Server } from 'botasaurus-server/server';
 import { AppUpdater } from './utils/AppUpdater'
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage'
 import { ipcMain } from './utils/ipc-main'
-import { config } from './config'
 
 let powerSaveId;
 
@@ -198,7 +197,9 @@ async function initDbAndExecutor(onReady) {
       checkMasterHealth()
       // Remove this if your app does not use auto updates
       // eslint-disable-next-line
-      AppUpdater.init()
+      if (!config.isDev) {
+        AppUpdater.init()
+      }
   
 }
 /*
