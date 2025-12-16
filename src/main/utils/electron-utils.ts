@@ -78,8 +78,6 @@ export function getApiArgs() {
   let onlyRunApi = false;
   let hasServerArguments = false;
   let apiBasePath: string  = '';
-  let isWorker: boolean  = false;
-  let isMaster: boolean  = false;
 
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
@@ -106,17 +104,10 @@ export function getApiArgs() {
           i++;
         }
         break;
-      case '--worker':
-        hasServerArguments = true;
-        isWorker = true;
-        break;
-      case '--master':
-        hasServerArguments = true;
-        isMaster = true;
-        break;
+     
     }
   }
-  return { port, onlyRunApi, hasServerArguments, apiBasePath, isWorker, isMaster};
+  return { port, onlyRunApi, hasServerArguments, apiBasePath};
 }
 
 

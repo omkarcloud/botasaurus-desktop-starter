@@ -4,7 +4,7 @@ import { generateAppProps } from './utils/generate-app-props'
 import { app, BrowserWindow, powerSaveBlocker, shell } from 'electron'
 import path from 'path'
 import { addRoutesHandler, setUpRendererToServerCall } from './utils/set-up-renderer-to-server-call'
-import { isDev } from 'botasaurus-server/env'
+import { isDev, isMaster, isWorker } from 'botasaurus-server/env'
 import { initAutoIncrementDb } from 'botasaurus-server/models'
 import {getAssetPath, resolveHtmlPath, enableElectronDebugTools, registerDeepLinkProtocol, restoreAndFocusMainWindow, getApiArgs, getAPI, startServer, stopServer, createRouteAliasesObj } from './utils/electron-utils'
 import MenuBuilder from './menu'
@@ -47,7 +47,7 @@ function main() {
     return;
   }
 
-  if (apiArgs.isWorker) {
+  if (isWorker) {
     console.log('[APP] App already running, starting in Worker mode, without Api')
     initDbAndExecutor(null)
     return;
@@ -83,7 +83,7 @@ process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 }
 
 function runAppAndApi(apiArgs: ReturnType<typeof getApiArgs>) {
-  const { port, onlyRunApi, hasServerArguments, apiBasePath, isWorker, isMaster} = apiArgs
+  const { port, onlyRunApi, hasServerArguments, apiBasePath, } = apiArgs
   const API = getAPI()
   
   let finalPORT:number
