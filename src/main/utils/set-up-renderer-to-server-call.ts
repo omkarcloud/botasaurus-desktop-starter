@@ -2,6 +2,7 @@ import { shell, dialog } from 'electron';
 import { ipcMain } from './ipc-main';
 import * as routes from 'botasaurus-server/task-routes';
 import { config } from '../config'
+import { getWindow } from './window';
 
 let isBackendSetUp = false;
 let isRoutesAdded = false;
@@ -10,11 +11,54 @@ let isRoutesAdded = false;
 function pickId(x) {
   return { id: x.id }
 }
+
+function sendToRenderer(channel: string, data: any) {
+  const window = getWindow();
+  window?.webContents.send(channel, data);
+}
+
 export function addRoutesHandler() {
   if (isRoutesAdded) return;
 
   for (const [key, value] of Object.entries(routes)) {
-    if (key === 'createAsyncTask') {
+    if (key === 'patchTask') {
+      ipcMain.handle(key, async (event, ...data) => {
+
+        if(data[1].action !== 'abort' ){
+          // @ts-ignore
+          return value(...data)
+        }
+
+        const taskId = data[1].task_ids[0];
+        const requestId = data[0].requestId;
+
+        
+        // @ts-ignore
+        value(...data).then(async (result: any) => {
+            // Send success to unique channel
+            sendToRenderer(`task-abort-result-${requestId}`, {
+              taskId,
+              success: true,
+              result,
+              error: null
+            });
+          })
+          .catch((error: any) => {
+            // Send error to unique channel
+            sendToRenderer(`task-abort-result-${requestId}`, {
+              taskId,
+              success: false,
+
+              result: null,
+              error: error?.message || 'Failed to abort task'
+            });
+          });
+      
+        // Return immediately - don't wait for abort to complete
+        return {};
+      })
+    }
+    else if (key === 'createAsyncTask') {
       ipcMain.handle(key, async (_, ...data) => {
       // @ts-ignore
         let result = await value(...data)

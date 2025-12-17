@@ -1,4 +1,3 @@
-import { EuiLink } from '@elastic/eui/optimize/es/components/link/link';
 import { useEffect, useRef, useState } from 'react';
 import { EuiText } from '@elastic/eui/optimize/es/components/text/text';
 
@@ -7,8 +6,7 @@ import { isEmpty, isEmptyObject } from '../../utils/missc';
 import { hasFilters, hasSorts, hasViews, isDoing, TaskStatus } from '../../utils/models';
 import CenteredSpinner from '../CenteredSpinner';
 import DownloadStickyBar from '../DownloadStickyBar/DownloadStickyBar';
-import { EmptyAborted, EmptyFailed, EmptyFilterResults, EmptyInProgress, EmptyPending, EmptyResults } from '../Empty/Empty';
-import { Link } from '../Link';
+import { EmptyAborted, EmptyFailed, EmptyFilterResults, EmptyInProgress, EmptyPending, EmptyResults, GoBackLink, TaskListQueryParams } from '../Empty/Empty';
 import { Pagination } from '../Pagination';
 import { Container, OutputContainerWithBottomPadding, OutputTabsContainer } from '../Wrappers';
 import DataPanel from './DataPanel';
@@ -123,6 +121,16 @@ const TaskComponent = ({
   response: initialResponse,
   productName,
   taskId,
+  queryParams = {},
+}: {
+  sorts: any;
+  filters: any;
+  views: any;
+  default_sort: any;
+  response: any;
+  productName: string;
+  taskId: number;
+  queryParams?: TaskListQueryParams;
 }) => {
   const functionsRef = useRef<any[]>([]);
 
@@ -145,9 +153,10 @@ const TaskComponent = ({
     }
   }, [])
   const [response, setResponse] = useState(initialResponse)
+  const is_large = response.task.is_large
   const defaultView = views.length > 0 ? views[0].id : null
 
-  const [sort, setSort] = useState(default_sort || '')
+  const [sort, setSort] = useState((default_sort && !is_large) ? default_sort: '')
   const [pageAndView, setPageAndView] = useState({
     currentPage: 0,
     view: defaultView,
@@ -292,25 +301,25 @@ const TaskComponent = ({
       case TaskStatus.PENDING:
         return (
           <Container>
-            <EmptyPending />
+            <EmptyPending queryParams={queryParams} />
           </Container>
         )
       case TaskStatus.IN_PROGRESS:
         return (
           <Container>
-            <EmptyInProgress />
+            <EmptyInProgress queryParams={queryParams} />
           </Container>
         )
       case TaskStatus.FAILED:
         return (
           <Container>
-            <EmptyFailed error={response.results} />
+            <EmptyFailed error={response.results} queryParams={queryParams} />
           </Container>
         )
       case TaskStatus.ABORTED:
         return (
           <Container>
-            <EmptyAborted />
+            <EmptyAborted queryParams={queryParams} />
           </Container>
         )
       default:
@@ -328,7 +337,7 @@ const TaskComponent = ({
     }))
   }
   const outputContainerClass:any = hasResults && response.results.length <= 5 ? "OutputContainerWithBottomPadding" : null
-  const is_large = response.task.is_large
+  
   const filterComponent = hasFilters(filters) ? (
     <FilterComponent
       filter_data={filter_data}
@@ -344,9 +353,7 @@ const TaskComponent = ({
     <>
       <OutputTabsContainer>
         <div className='space-y-6 mt-6 '>
-          <Link href={`/tasks`} passHref>
-            <EuiLink>View All Tasks</EuiLink>
-          </Link>
+          <GoBackLink queryParams={queryParams} />
           {can_sort_filter && (is_large ? 
             <EuiText size='s'>
           <p>

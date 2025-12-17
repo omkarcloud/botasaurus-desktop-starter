@@ -63,8 +63,23 @@ function getApi() {
     return fetch({ route: "getApi", silent: true })
 }
 
-function getTasksForUiDisplay(page = 1) {
-    return fetch({ route: "getTasksForUiDisplay", silent: true }, { page })
+interface TaskFiltersParam {
+    search?: string;
+    status?: string;
+    task_kind?: string;
+    scraper_name?: string;
+}
+
+function getTasksForUiDisplay(page = 1, filters: TaskFiltersParam = {}) {
+    const params: Record<string, any> = { page };
+    
+    // Only include non-empty filter values
+    if (filters.search) params.search = filters.search;
+    if (filters.status && filters.status !== 'any') params.status = filters.status;
+    if (filters.task_kind && filters.task_kind !== 'any') params.task_kind = filters.task_kind;
+    if (filters.scraper_name && filters.scraper_name !== 'any') params.scraper_name = filters.scraper_name;
+    
+    return fetch({ route: "getTasksForUiDisplay", silent: true }, params)
 }
 
 function isAnyTaskUpdated(pending_task_ids: any[], progress_task_ids: any[], all_tasks: any[]) {
@@ -83,22 +98,42 @@ function isTaskUpdated(taskId: number, lastUpdated: string, status: string) {
     })
 }
 
-function abortTask(task_id: number, page: number) {
-    return fetch({ route: "patchTask", message: 'Aborting...' }, { page }, {
+function abortTask(task_id: number, page: number, filters: TaskFiltersParam = {}, requestId: number) {
+    const params: Record<string, any> = { page, requestId };
+    if (filters.search) params.search = filters.search;
+    if (filters.status && filters.status !== 'any') params.status = filters.status;
+    if (filters.task_kind && filters.task_kind !== 'any') params.task_kind = filters.task_kind;
+    if (filters.scraper_name && filters.scraper_name !== 'any') params.scraper_name = filters.scraper_name;
+    
+    return fetch({ route: "patchTask", message: 'Aborting...', silent: true, silentOnError: true }, params, {
         action: 'abort',
         task_ids: [task_id]
     })
 }
 
-function deleteTask(task_id: number, page: number) {
-    return fetch({ route: "patchTask", message: 'Deleting...' }, { page }, {
+
+
+function deleteTask(task_id: number, page: number, filters: TaskFiltersParam = {}) {
+    const params: Record<string, any> = { page };
+    if (filters.search) params.search = filters.search;
+    if (filters.status && filters.status !== 'any') params.status = filters.status;
+    if (filters.task_kind && filters.task_kind !== 'any') params.task_kind = filters.task_kind;
+    if (filters.scraper_name && filters.scraper_name !== 'any') params.scraper_name = filters.scraper_name;
+    
+    return fetch({ route: "patchTask", message: 'Deleting...' }, params, {
         action: 'delete',
         task_ids: [task_id]
     })
 }
 
-function retryTask(task_id: number, page: number) {
-    return fetch({ route: "patchTask", message: 'Retrying...' }, { page }, {
+function retryTask(task_id: number, page: number, filters: TaskFiltersParam = {}) {
+    const params: Record<string, any> = { page };
+    if (filters.search) params.search = filters.search;
+    if (filters.status && filters.status !== 'any') params.status = filters.status;
+    if (filters.task_kind && filters.task_kind !== 'any') params.task_kind = filters.task_kind;
+    if (filters.scraper_name && filters.scraper_name !== 'any') params.scraper_name = filters.scraper_name;
+    
+    return fetch({ route: "patchTask", message: 'Retrying...' }, params, {
         action: 'retry',
         task_ids: [task_id]
     })
@@ -106,6 +141,16 @@ function retryTask(task_id: number, page: number) {
 
 function downloadTaskResults(taskId: number, data: any = {}) {
     return fetch({ route: "downloadTaskResults", message: 'Downloading...' }, taskId, data)
+}
+
+function downloadTaskList(filters: TaskFiltersParam = {}, data: any = {}) {
+    const params: Record<string, any> = {};
+    if (filters.search) params.search = filters.search;
+    if (filters.status && filters.status !== 'any') params.status = filters.status;
+    if (filters.task_kind && filters.task_kind !== 'any') params.task_kind = filters.task_kind;
+    if (filters.scraper_name && filters.scraper_name !== 'any') params.scraper_name = filters.scraper_name;
+    
+    return fetch({ route: "downloadTaskList", message: 'Downloading...' }, params, data)
 }
 
 function openInFolder(path:string) {
@@ -145,6 +190,7 @@ const Api = {
     deleteTask,
     retryTask,
     downloadTaskResults,
+    downloadTaskList,
     getUiTaskResults,
     getSearchOptions,
 }

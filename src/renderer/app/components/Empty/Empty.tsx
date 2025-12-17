@@ -6,14 +6,26 @@ import { EuiLink } from '@elastic/eui/optimize/es/components/link/link';
 import { EuiImage } from '@elastic/eui/optimize/es/components/image/image';
 
 import CenteredSpinner from '../CenteredSpinner';
-import { Link } from '../Link';
+import { Link, buildUrlWithParams } from '../Link';
 import { getPublicAsset } from '../../utils/missc'
 
+// Query params interface for task list navigation
+export interface TaskListQueryParams {
+  page?: number;
+  search?: string;
+  status?: string;
+  task_kind?: string;
+  scraper_name?: string;
+}
 
-function OutputLink() {
-  return <Link href={`/tasks`} passHref>
-    <EuiLink>View All Tasks</EuiLink>
-  </Link>
+// Go Back link component that preserves query params
+export function GoBackLink({ queryParams = {} }: { queryParams?: TaskListQueryParams }) {
+  const href = buildUrlWithParams('/tasks', queryParams)
+  return (
+    <Link href={href} passHref>
+      <EuiLink>Go Back</EuiLink>
+    </Link>
+  )
 }
 
 export const EmptyInputs = props => {
@@ -167,10 +179,10 @@ export const EmptyFilterResults = props => {
   )
 }
 
-export const EmptyPending = () => {
+export const EmptyPending = ({ queryParams = {} }: { queryParams?: TaskListQueryParams }) => {
   return (
     <div className='space-y-8' style={{ padding: '80px 0', textAlign: 'center' }}>
-      <OutputLink/>
+      <GoBackLink queryParams={queryParams} />
       <EuiEmptyPrompt
         body={
           <div>
@@ -186,10 +198,10 @@ export const EmptyPending = () => {
   )
 }
 
-export const EmptyInProgress = () => {
+export const EmptyInProgress = ({ queryParams = {} }: { queryParams?: TaskListQueryParams }) => {
   return (
     <div className='space-y-8' style={{ padding: '80px 0', textAlign: 'center' }}>
-      <OutputLink/>
+      <GoBackLink queryParams={queryParams} />
       <EuiEmptyPrompt
         body={
           <div>
@@ -206,10 +218,10 @@ export const EmptyInProgress = () => {
   )
 }
 
-export const EmptyFailed = ({ error }) => {
+export const EmptyFailed = ({ error, queryParams = {} }: { error: any; queryParams?: TaskListQueryParams }) => {
   return (
     <div className='space-y-8' style={{ padding: '80px 0', textAlign: 'center' }}>
-      <OutputLink/>
+      <GoBackLink queryParams={queryParams} />
       <EuiEmptyPrompt
         body={
           error ? <div>
@@ -297,10 +309,10 @@ export const ApiEmpty = ({ error , }) => {
 
 
 
-export const EmptyAborted = () => {
+export const EmptyAborted = ({ queryParams = {} }: { queryParams?: TaskListQueryParams }) => {
   return (
     <div className='space-y-8' style={{ padding: '80px 0', textAlign: 'center' }}>
-      <OutputLink/>
+      <GoBackLink queryParams={queryParams} />
       <EuiEmptyPrompt
         body={
           <div>

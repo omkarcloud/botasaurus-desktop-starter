@@ -9,7 +9,7 @@ function findScraperConfig(scrapers: any, task: any) {
   )
 }
 
-const Page = ({ taskId, scrapers, ...props }: any) => {
+const Page = ({ taskId, scrapers, queryParams, ...props }: any) => {
   const response = props.response
   const task = response.task
   const scraperConfig = findScraperConfig(scrapers, task)
@@ -22,7 +22,13 @@ const Page = ({ taskId, scrapers, ...props }: any) => {
     <>
       <Seo title={`Results ${taskId}`} />
       <AuthedDashboard {...props}>
-        <TaskComponent taskId={taskId} response={response} {...scraperConfig} productName={props.productName} />
+        <TaskComponent 
+          taskId={taskId} 
+          response={response} 
+          {...scraperConfig} 
+          productName={props.productName}
+          queryParams={queryParams}
+        />
       </AuthedDashboard>
     </>
   )

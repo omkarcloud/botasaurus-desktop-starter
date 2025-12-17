@@ -21,7 +21,8 @@ export const appProps = {
             ],
             "views": [],
             "default_sort": "no_sort",
-            "max_runs": 1
+            "max_runs": 1,
+            "create_all_task": false
         }
     ],
     "productName": "Todo My App Name"

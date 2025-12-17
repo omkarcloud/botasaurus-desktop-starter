@@ -4,9 +4,10 @@ import { EuiButtonEmpty } from '@elastic/eui/optimize/es/components/button/butto
 import { EuiForm } from '@elastic/eui/optimize/es/components/form/form';
 import { EuiFormRow } from '@elastic/eui/optimize/es/components/form/form_row/form_row';
 import { EuiIcon } from '@elastic/eui/optimize/es/components/icon/icon';
+import { EuiTextArea } from '@elastic/eui/optimize/es/components/form/text_area/text_area';
 import { EuiToolTip } from '@elastic/eui/optimize/es/components/tool_tip/tool_tip';
 import { Control, createControls, WithChooseOptions } from 'botasaurus-controls';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import scraperToInputJs from '../../utils/scraper-to-input-js';
 import Api from '../../utils/api';
@@ -46,6 +47,161 @@ function saveDataToLocalStorage(selectedScraper: any, newData: any) {
     console.error('Error saving to localStorage:', error);
   }
 }
+
+
+
+function createHelpfulJsonError(e: any, trimmedValue: string) {
+  const errorMessage = e.message || 'Invalid JSON'
+
+  // Extract position info if available
+  const positionMatch = errorMessage.match(/position\s+(\d+)/i)
+  const position = positionMatch ? parseInt(positionMatch[1], 10) : null
+
+  let helpfulMessage = 'Invalid JSON: '
+
+  // Check for common mistakes
+  if (trimmedValue.includes("'") && !trimmedValue.includes('"')) {
+    helpfulMessage += "Use double quotes (\") instead of single quotes (') for strings."
+  } else if (/,\s*[}\]]/.test(trimmedValue)) {
+    helpfulMessage += "Trailing comma found. Remove the comma before the closing bracket."
+  } else if (errorMessage.includes('Unexpected token')) {
+    if (position !== null) {
+      const contextStart = Math.max(0, position - 10)
+      const contextEnd = Math.min(trimmedValue.length, position + 10)
+      const context = trimmedValue.substring(contextStart, contextEnd)
+      helpfulMessage += `Unexpected character near position ${position}: "...${context}..."`
+    } else {
+      helpfulMessage += errorMessage
+    }
+  } else if (errorMessage.includes('Unexpected end')) {
+    helpfulMessage += "JSON is incomplete. Check for missing closing brackets or quotes."
+  } else {
+    helpfulMessage += errorMessage
+  }
+  return helpfulMessage
+}
+
+// Format validation errors as a readable list
+function formatValidationErrors(validationResult: Record<string, string>): string[] {
+  return Object.entries(validationResult).map(([field, message]) => `${field}: ${message}`);
+}
+
+// JSON Editor Component for editing all data as JSON
+const JsonDataEditor = ({
+  data,
+  onDataChange,
+  onSwitchToForm,
+  onSubmit,
+  onReset,
+  isSubmitting,
+  submitAttempted,
+  setSubmitAttempted, 
+  validationResult,
+}: {
+  data: any;
+  onDataChange: (newData: any) => void;
+  onSwitchToForm: () => void;
+  onSubmit: (e?: any) => void;
+  onReset: () => void;
+  setSubmitAttempted: (submitAttempted: boolean) => void;
+  isSubmitting: boolean;
+  submitAttempted: boolean;
+  validationResult: Record<string, string>;
+}) => {
+  const [jsonText, setJsonText] = useState(() => JSON.stringify(data, null, 2));
+  const [parseError, setParseError] = useState<string | null>(null);
+  const lastDataRef = useRef(data);
+
+  // Sync jsonText when data changes externally (e.g., reset)
+  useEffect(() => {
+    const newDataStr = JSON.stringify(data, null, 2);
+    // Only update if JSON representation is different (avoids unnecessary updates)
+    if (newDataStr !== JSON.stringify(lastDataRef.current, null, 2)) {
+      setJsonText(newDataStr);
+      setParseError(null);
+    }
+    lastDataRef.current = data;
+  }, [data]);
+
+  const handleJsonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    setJsonText(newText);
+    
+    const trimmedValue = newText.trim()
+    try {
+      const parsed = JSON.parse(trimmedValue);
+      setParseError(null);
+      lastDataRef.current = parsed;
+      onDataChange(parsed);
+    } catch (err: any) {
+      const helpfulMessage = createHelpfulJsonError(err, trimmedValue)
+      setParseError(helpfulMessage);
+    }
+  };
+
+  const handleReset = () => {
+    onReset();
+  };
+
+  // Only show errors after submit attempt
+  const showErrors = submitAttempted;
+  const hasValidationErrors = !isEmptyObject(validationResult);
+  
+  // Determine which error to show: parseError takes priority, then validation errors
+  const hasError = showErrors && (parseError || hasValidationErrors);
+  const errorMessages = showErrors
+    ? parseError
+      ? [parseError]
+      : hasValidationErrors
+        ? formatValidationErrors(validationResult)
+        : undefined
+    : undefined;
+
+  // Calculate rows based on content (min 8, max 30)
+  const lineCount = jsonText.split('\n').length;
+  const calculatedRows = Math.min(Math.max(lineCount + 2, 8), 30);
+
+  return (
+    <div>
+      <EuiFormRow
+        label="Edit Data as JSON"
+        isInvalid={!!hasError}
+        error={errorMessages}
+        fullWidth
+      >
+        <EuiTextArea
+          fullWidth
+          rows={calculatedRows}
+          value={jsonText}
+          onChange={handleJsonChange}
+          isInvalid={!!hasError}
+          style={{ fontFamily: 'monospace' }}
+        />
+      </EuiFormRow>
+      <div className="mt-6 flex gap-x-8 items-center">
+        <EuiButton disabled={isSubmitting} type="submit" fill onClick={(e)=>{
+          if (!submitAttempted){
+            if (parseError){
+              setSubmitAttempted(true);
+              e.preventDefault();
+              return 
+            }
+          }
+          
+          onSubmit(e)
+        }}>
+          Run
+        </EuiButton>
+        <div className="flex gap-x-2">
+          <EuiButtonEmpty onClick={handleReset}>Reset to Default</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onSwitchToForm}>
+            Switch to Form
+          </EuiButtonEmpty>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 
 function mapControlsToElements(
@@ -108,6 +264,23 @@ const InputFields = ({
   enableCache,
   onEnableCacheChange,
   showCache,
+  onSwitchToJson,
+}: {
+  filePickerRefs: any;
+  isSubmitting: boolean;
+  validationResult: any;
+  controls: any;
+  data: any;
+  onDataChange: (id: string, value: any) => void;
+  onSubmit: (e?: any) => void;
+  onReset: () => void;
+  submitAttempted: boolean;
+  accords: any;
+  onToggle: (id: string, state: string) => void;
+  enableCache: boolean;
+  onEnableCacheChange: (value: boolean) => void;
+  showCache: boolean;
+  onSwitchToJson: () => void;
 }) => {
   const handleInputChange = (id, value) => {
     onDataChange(id, value)
@@ -378,11 +551,16 @@ const InputFields = ({
           />
         </EuiFormRow>
       </CollapsibleSection>}
-      <div className="mt-6 flex gap-x-8">
+      <div className="mt-6 flex gap-x-8 items-center">
         <EuiButton disabled={isSubmitting} type="submit" fill onClick={onSubmit}>
           Run
         </EuiButton>
-        <EuiButtonEmpty onClick={onReset}>Reset to Default</EuiButtonEmpty>
+        <div className="flex gap-x-2">
+          <EuiButtonEmpty onClick={onReset}>Reset to Default</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onSwitchToJson}>
+            Switch to JSON
+          </EuiButtonEmpty>
+        </div>
       </div>
     </div>
   )
@@ -462,7 +640,7 @@ function createInitialData(selectedScraper: any) {
 const ScraperFormContainer = ({ scrapers, enable_cache }) => {
   const [submitAttempted, setSubmitAttempted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [isJsonEditorMode, setIsJsonEditorMode] = useState(false)
 
   const [{data, selectedScraper }, setData] = useState(() =>{
     const selectedScraper =  getLastScraper(scrapers)
@@ -513,6 +691,26 @@ const ScraperFormContainer = ({ scrapers, enable_cache }) => {
       saveDataToLocalStorage(selectedScraper, {...newData, ...filePickerData})
       return {...prevData, data:newData} 
     })
+  }
+
+  // Handler for JSON editor - sets entire data object
+  const handleJsonDataChange = (newData: any) => {
+    const filePickerData = filePickerControlIds.reduce((acc, id) => {
+      acc[id] = []; // Reset file picker data
+      return acc;
+    }, {});
+    saveDataToLocalStorage(selectedScraper, {...newData, ...filePickerData})
+    setData(prevData => ({...prevData, data: newData}))
+  }
+
+  const handleResetData = () => {
+    const dd = getDefaultData(controls)
+    localStorage.setItem(
+      `input_${selectedScraper.scraper_name}_${selectedScraper.input_js_hash}`,
+      JSON.stringify(dd)  
+    )
+    resetFilePickers()
+    setData(x=>({...x, data:dd}))
   }
   const router = useRouter()
   // @ts-ignore
@@ -612,6 +810,7 @@ return (
       x.scraper_name
     )
      resetFilePickers()
+     setSubmitAttempted(false)
      
       setEnableCache(getEnableCacheDefaultValue(enable_cache, x.scraper_name, x.input_js_hash))
       setData(createInitialData(x))
@@ -622,33 +821,47 @@ isInvalid={submitAttempted && !isEmptyObject(validationResult)}
 invalidCallout="none"
 component="form"
 onSubmit={handleSubmit}>
-<NextOnlyFields
-  filePickerRefs={filePickerRefs}
-  onReset={() => {
-    const dd = getDefaultData(controls)
-    localStorage.setItem(
-      `input_${selectedScraper.scraper_name}_${selectedScraper.input_js_hash}`,
-      JSON.stringify(dd)
-    )
-    resetFilePickers()
-    setData(x=>({...x, data:dd}))
-  }}
-  accords={accords}
-  onToggle={onToggle}
-  validationResult={validationResult}
-  controls={controls}
-  data={data}
-  onDataChange={handleDataChange}
-  onSubmit={handleSubmit}
-  isSubmitting={isSubmitting}
-  submitAttempted={submitAttempted}
-  enableCache={enableCache}
-  showCache={showCache}
-  onEnableCacheChange={(x) =>{
-    setEnableCacheDefaultValue(x, selectedScraper.scraper_name, selectedScraper.input_js_hash);
-    setEnableCache(x);
+{isJsonEditorMode ? (
+  <JsonDataEditor
+    data={data}
+    onDataChange={handleJsonDataChange}
+    onSwitchToForm={() => {
+      resetFilePickers()
+      setSubmitAttempted(false)
+      setIsJsonEditorMode(false)
     }}
-/>
+    onSubmit={handleSubmit}
+    onReset={handleResetData}
+    setSubmitAttempted={setSubmitAttempted}
+    isSubmitting={isSubmitting}
+    submitAttempted={submitAttempted}
+    validationResult={validationResult}
+  />
+) : (
+  <NextOnlyFields
+    filePickerRefs={filePickerRefs}
+    onReset={handleResetData}
+    accords={accords}
+    onToggle={onToggle}
+    validationResult={validationResult}
+    controls={controls}
+    data={data}
+    onDataChange={handleDataChange}
+    onSubmit={handleSubmit}
+    isSubmitting={isSubmitting}
+    submitAttempted={submitAttempted}
+    enableCache={enableCache}
+    showCache={showCache}
+    onEnableCacheChange={(x) =>{
+      setEnableCacheDefaultValue(x, selectedScraper.scraper_name, selectedScraper.input_js_hash);
+      setEnableCache(x);
+      }}
+    onSwitchToJson={() => {
+      setSubmitAttempted(false)
+      setIsJsonEditorMode(true)
+    }}
+  />
+)}
 </EuiForm>
 </>
 
