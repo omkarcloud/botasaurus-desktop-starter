@@ -73,7 +73,7 @@ const STATUS_OPTIONS = [
 const TASK_KIND_OPTIONS = [
   { value: 'any', label: 'Any' },
   { value: 'parent', label: 'Parent Task' },
-  { value: 'subtask', label: 'Subtask' },
+  { value: 'child', label: 'Child Task' },
 ];
 
 // Check if any filter is active (non-default)
