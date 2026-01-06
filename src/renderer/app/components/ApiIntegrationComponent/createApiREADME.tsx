@@ -294,6 +294,28 @@ fs.writeFileSync(filename, buffer)
   }
 }
 
+function createInputDataHelpSection(defaultData: any): string {
+  const keyCount = Object.keys(defaultData).length
+  
+  if (keyCount <= 5) {
+    return ''
+  }
+  
+  return `
+### How to Know What Input Data to Send?
+
+This scraper accepts a high number of input parameters (${keyCount} keys), which can make it hard to know which ones to send. Follow this method to determine the right inputs:
+
+1. Go to the **Input** Tab
+2. Change the Input to your desired configuration
+3. Click the **"Switch to JSON"** Button and copy the JSON — this is your data
+
+![Switch to JSON](https://raw.githubusercontent.com/omkarcloud/assets/master/images/botasaurus/switch-to-json.png)
+
+4. You can tweak this copied JSON data to customize what inputs to send.
+`
+}
+
 function makeAPI(baseUrl, apiBasePath) {
   const config: string[] = []
 
@@ -392,7 +414,7 @@ Synchronous tasks, on the other hand, wait for the completion of the task. The s
 You should use asynchronous tasks when you want to run a task in the background and retrieve the results later. Synchronous tasks are better suited for scenarios where you have a small number of tasks and want to wait and get the results immediately.
 
 ${createApiTaskText(scraperName, hasSingleScraper, defaultData, maxRunsMessage)}
-
+${createInputDataHelpSection(defaultData)}
 ### Fetching Tasks
 
 To fetch tasks from the server, use the \`getTasks\` method:

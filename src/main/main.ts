@@ -26,10 +26,51 @@ import { AppUpdater } from './utils/AppUpdater'
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage'
 import { ipcMain } from './utils/ipc-main'
 
+
+function exitHandler(options) {
+  if (options.cleanup) {
+    // 1. Stop accepting new requests
+    stopServer()
+    
+    // 2. Release in-progress tasks back to master (K8s worker only)
+    if (global.cleanupWorker) {
+      global.cleanupWorker(options.signal || 'shutdown')
+    }
+    
+    // 3. Close all Chrome instances
+    if (global.closeAllChromes) {
+      global.closeAllChromes()
+    }
+  }
+  if (options.exit) process.exit();
+}
+
+// do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+// catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {cleanup:true, exit:true}));
+process.on('SIGTERM', exitHandler.bind(null, {cleanup:true, exit:true}));
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {cleanup:true, exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {cleanup:true, exit:true}));
+
+process.on('uncaughtException', exitHandler.bind(null, {cleanup:true, exit:true}));
+
+
 let powerSaveId;
 
 
 function main() {
+
+  const apiArgs = getApiArgs()
+
+  if (isWorker) {
+    console.log('[APP] Starting in Worker mode, without Api')
+    console.log(`[Worker] Started with PID: ${process.pid}`);
+    initDbAndExecutor(null)
+    return;
+  }
 
   if (config.isDev) {
     generateAppProps();
@@ -39,17 +80,12 @@ function main() {
     return;
   }
 
+  registerDeepLinkProtocol()
+
   const gotTheLock = app.requestSingleInstanceLock();
-  const apiArgs = getApiArgs()
 
   if (gotTheLock) {
     runAppAndApi(apiArgs)
-    return;
-  }
-
-  if (isWorker) {
-    console.log('[APP] App already running, starting in Worker mode, without Api')
-    initDbAndExecutor(null)
     return;
   }
 
@@ -58,29 +94,6 @@ function main() {
 }
 main()
 
-function closeServerOnExit() {
-
-function exitHandler(options) {
-  if (options.cleanup) {
-    stopServer()
-  }
-  if (options.exit) process.exit();
-}
-
-// do something when app is closing
-process.on('exit', exitHandler.bind(null,{cleanup:true}));
-
-// catches ctrl+c event
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));
-
-// catches "kill pid" (for example: nodemon restart)
-process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
-process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
-
-process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
-
-  
-}
 
 function runAppAndApi(apiArgs: ReturnType<typeof getApiArgs>) {
   const { port, onlyRunApi, hasServerArguments, apiBasePath, } = apiArgs
@@ -89,7 +102,7 @@ function runAppAndApi(apiArgs: ReturnType<typeof getApiArgs>) {
   let finalPORT:number
   let onQuit
 
-  if ((isWorker || isMaster) && !API) {
+  if (isMaster && !API) {
     throw new Error(
 `The API is not enabled in "api-config.ts".
 To enable it:
@@ -101,10 +114,9 @@ To enable it:
     finalPORT = port || API.apiPort
     onQuit = stopServer
 
-    if (API.apiOnlyMode || onlyRunApi || isWorker) {
+    if (API.apiOnlyMode || onlyRunApi) {
        
        return runAppWithoutWindow(onQuit, () => {
-        closeServerOnExit()
         return startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
       })
     }
@@ -114,7 +126,6 @@ To enable it:
   }
   runApp(onQuit, () => {
     if (API) {
-      closeServerOnExit()
       ipcMain.on('start-server', () => {
         getBotasaurusStorage().setItem('shouldStartServer', true)
         startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
@@ -197,7 +208,7 @@ async function initDbAndExecutor(onReady) {
       checkMasterHealth()
       // Remove this if your app does not use auto updates
       // eslint-disable-next-line
-      if (!config.isDev) {
+      if (!config.isDev && !isWorker && !isMaster) {
         AppUpdater.init()
       }
   
@@ -213,7 +224,6 @@ function checkMasterHealth() {
 }
 
 function runApp(onQuit, onWindowMade) {
-  registerDeepLinkProtocol()
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     restoreAndFocusMainWindow()
@@ -263,7 +273,6 @@ function runApp(onQuit, onWindowMade) {
 }
 
 function runAppWithoutWindow(onQuit, onReady) {
-  registerDeepLinkProtocol()
   if (isDev) {
     enableElectronDebugTools()
   }

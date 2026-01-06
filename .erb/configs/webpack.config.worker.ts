@@ -1,64 +1,46 @@
 /**
- * Webpack config for production electron main process
+ * Webpack config for K8s worker
+ * - Production build WITHOUT minification for easy debugging
+ * - Outputs single worker.js to project root
+ * - Includes source maps
  */
 
 import path from 'path';
 import webpack from 'webpack';
 import { merge } from 'webpack-merge';
-import TerserPlugin from 'terser-webpack-plugin';
-import { getAnalyzerPlugins } from './getAnalyzerPlugins';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
-import checkNodeEnv from '../scripts/check-node-env';
-import deleteSourceMaps from '../scripts/delete-source-maps';
-import { prodMainCopyPlugins } from './copy-plugin'
-
-checkNodeEnv('production');
-deleteSourceMaps();
-
-const MINIFY = process.env.MINIFY !== 'false';
-
 const configuration: webpack.Configuration = {
+  // Source maps for debugging in production
   devtool: false,
 
   mode: 'production',
 
   target: 'electron-main',
 
+  // Only main entry - worker doesn't need preload
   entry: {
-    main: path.join(webpackPaths.srcMainPath, 'main.ts'),
-    preload: path.join(webpackPaths.srcMainPath, 'preload.ts'),
+    worker: path.join(webpackPaths.srcMainPath, 'main.ts'),
   },
 
   output: {
-    path: webpackPaths.distMainPath,
+    // Output to project root as worker.js
+    path: webpackPaths.rootPath,
     filename: '[name].js',
     library: {
       type: 'umd',
     },
   },
 
-  optimization: MINIFY ? {
-    minimizer: [
-      new TerserPlugin({
-        parallel: true,
-      }),
-    ],
-  } : {
-    minimize: false, // ← Disables all minification
+  // NO MINIFICATION - easy to debug in K8s
+  optimization: {
+    minimize: false,
     concatenateModules: true,
   },
 
   plugins: [
-    ...prodMainCopyPlugins,
-    ...getAnalyzerPlugins(),
-
     /**
      * Create global constants which can be configured at compile time.
-     *
-     * Useful for allowing different behaviour between development builds and
-     * release builds
-     *
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      */
@@ -86,3 +68,8 @@ const configuration: webpack.Configuration = {
 };
 
 export default merge(baseConfig, configuration);
+
+
+
+
+

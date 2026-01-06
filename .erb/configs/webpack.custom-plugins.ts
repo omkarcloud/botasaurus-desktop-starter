@@ -7,21 +7,29 @@ function getTempPath(): string {
   return path.join(process.cwd(), 'temp.js')
 }
 
+function deleteTempFile() {
+  // Delete temp file after execution
+  try {
+    fs.unlinkSync(getTempPath())
+  } catch (e) {
+    // Ignore delete errors
+  }
+}
+
 function runCode(contents:string) {
   writeFile(contents, getTempPath(), false)
 
   exec('node ./temp.js', (error, stdout, stderr) => {
+    deleteTempFile()
+    
     if (error) {
       console.error(`Error executing temp.js: ${error}`)
+      return
     }
+    
     if (stderr) {
       console.error(`stderr: ${stderr}`)
-    }
-    // Delete temp file after execution
-    try {
-      fs.unlinkSync(getTempPath())
-    } catch (e) {
-      // Ignore delete errors
+      return
     }
   })
 }
@@ -35,17 +43,7 @@ export class GenerateApiPropsPlugin {
         if (targetFiles.includes( assetName ) ){
           const asset = compAssets[assetName]
           const source:string = asset.source()
-          let contents = source.replace("main() {", "main() {(0,_utils_generate_app_props__WEBPACK_IMPORTED_MODULE_1__.generateAppProps)();return;")
-
-
-          // Fixes Input JS and README paths
-          contents = contents.replaceAll('if (isElectron) {', 'if (false) {')
-          
-          // Disable master logging
-          contents = contents.replaceAll('static async enableKubernetes({ masterEndpoint, taskTimeout = master_executor_1.DEFAULT_TASK_TIMEOUT }) {', 'static async enableKubernetes({ masterEndpoint, taskTimeout = master_executor_1.DEFAULT_TASK_TIMEOUT }) {return;')
-          contents = contents.replaceAll('factory(require("', 'factory(require("./release/app/node_modules/')
-          // Sentry FIX
-          contents = contents.replace('function __webpack_require__(moduleId) {', 'function __webpack_require__(moduleId) {if (moduleId.includes("sentry")){return {}};')
+          let contents = fixSourceCode(source)
           try {
             runCode(contents)
           } catch (error) {
@@ -58,3 +56,26 @@ export class GenerateApiPropsPlugin {
   }
 }
 
+function fixSourceCode(source: string) {
+  let contents = withGenerateProps(source)
+
+  // Fixes Input JS and README paths
+  contents = fixJsPaths(contents)
+
+  // Disable master logging
+  contents = disableKubernetes(contents)
+  
+  return contents
+}
+
+function disableKubernetes(contents: string): string {
+  return contents.replaceAll('static async enableKubernetes({ masterEndpoint, taskTimeout = master_executor_1.DEFAULT_TASK_TIMEOUT }) {', 'static async enableKubernetes({ masterEndpoint, taskTimeout = master_executor_1.DEFAULT_TASK_TIMEOUT }) {return;')
+}
+
+function fixJsPaths(contents: string): string {
+  return contents.replaceAll('if (isElectron) {', 'if (false) {')
+}
+
+function withGenerateProps(source: string) {
+  return source.replace("main() {", "main() {(0,_utils_generate_app_props__WEBPACK_IMPORTED_MODULE_1__.generateAppProps)();return;")
+}

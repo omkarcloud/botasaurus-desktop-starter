@@ -32,7 +32,7 @@ const ServerStatusComponent = () => {
 
         // Clear interval on component unmount
         return () => clearInterval(interval)
-    }, [])
+    }, [isDown])
 
     if (isDown) {
         return (

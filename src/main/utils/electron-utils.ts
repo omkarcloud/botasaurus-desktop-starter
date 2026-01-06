@@ -127,12 +127,16 @@ export function getAPI(): any {
 }
 export function startServer(...args: any[]): any {
   // @ts-ignore
-  return global.startServer(...args);
+  if (global.startServer) {
+    return global.startServer(...args);
+  }
 }
 
 export function stopServer(): any {
   // @ts-ignore
-  return  global.stopServer();
+  if (global.stopServer) {
+    return global.stopServer();
+  }
 }
 
 export function createRouteAliasesObj(API: any) {
