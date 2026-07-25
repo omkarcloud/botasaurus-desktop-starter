@@ -16,6 +16,10 @@ export const getPathForFile = electron.getPathForFile
 // @ts-ignore
 export const openFolderPicker = electron.openFolderPicker
 
+ipcRenderer.on("port-changed", (message) => {
+    alert(message)
+})
+
 ipcRenderer.on("log", console.log)
 
 for (const [key, value] of Object.entries(cogoToastRoute)) {

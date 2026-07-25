@@ -6,11 +6,12 @@ import scraperToInputJs from '../../utils/scraper-to-input-js'
 import { EmptyScraper } from '../Empty/Empty'
 import MarkdownComponent from '../MarkdownComponent/MarkdownComponent'
 import ScraperSelector from '../ScraperSelector/ScraperSelector'
-import ServerToggle, { getApiBasePath, getRouteAliases } from '../ServerToggle'
+import ServerToggle, { getApiBasePath, getRouteAliases, useServerState } from '../ServerToggle'
 import { getBaseUrl } from './getBaseUrl'
 import { createApiREADME } from './createApiREADME'
 
 const ContentContainer = ({ selectedScraper, hasSingleScraper , enable_cache}: { selectedScraper: any, hasSingleScraper: boolean  , enable_cache: boolean}) => {
+  useServerState() // re-render when the server's actual port arrives, so docs URLs stay correct
   const baseUrl = getBaseUrl()
 
   const sorts = selectedScraper.sorts

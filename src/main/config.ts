@@ -1,3 +1,4 @@
+import { isMaster, isWorker } from 'botasaurus/env';
 import { app } from 'electron';
 
 const isDev: boolean =
@@ -9,6 +10,7 @@ export const config = {
   downloadsPath: app ? app.getPath('downloads') : process.cwd(),
   userDataPath: app ? app.getPath('userData') : process.cwd(),
   isDev: isDev,
+  isDevWorkerOrMaster: isDev || isWorker || isMaster,
 };
 
 global.ELECTRON_CONFIG = config;

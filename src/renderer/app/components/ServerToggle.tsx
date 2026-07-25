@@ -1,5 +1,5 @@
 import { EuiLink } from '@elastic/eui/optimize/es/components/link/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EuiFormRow } from '@elastic/eui/optimize/es/components/form/form_row/form_row';
 import { ipcRenderer } from '../utils/electron';
 import SwitchField from './inputs/SwitchField';
@@ -9,6 +9,12 @@ let serverRunning = null;
 let serverPort = null;
 let serverApiBasePath = null;
 let routeAliases = null;
+
+const serverStateListeners = new Set<() => void>();
+
+function notifyServerStateListeners() {
+  serverStateListeners.forEach((listener) => listener());
+}
 
 export function getApiBasePath():any {
   return serverApiBasePath;
@@ -26,21 +32,36 @@ export function getRouteAliases():any {
   return routeAliases;
 }
 
-// Listen for server-state once globally (outside component)
-ipcRenderer.once('server-state', ({ isRunning, port, apiBasePath, routeAliases: aliases }: any) => {
+// Listen for server-state globally (outside component), main re-sends it with the actual port when the server starts
+ipcRenderer.on('server-state', ({ isRunning, port, apiBasePath, routeAliases: aliases }: any) => {
   serverRunning = isRunning;
   serverPort = port;
   serverApiBasePath = apiBasePath;
   routeAliases = aliases;
+  notifyServerStateListeners();
 });
 
+export function useServerState() {
+  const [state, setState] = useState({ isRunning: serverRunning, port: serverPort });
+
+  useEffect(() => {
+    const sync = () => setState({ isRunning: serverRunning, port: serverPort });
+    serverStateListeners.add(sync);
+    sync(); // catch a server-state that arrived between initial render and mount
+    return () => {
+      serverStateListeners.delete(sync);
+    };
+  }, []);
+
+  return state;
+}
 
 const ServerToggle = () => {
-  const [isRunning, setIsRunning] = useState(serverRunning);
+  const { isRunning, port } = useServerState();
 
   const handleToggle = (shouldStart) => {
-    setIsRunning(shouldStart);
     serverRunning = shouldStart;
+    notifyServerStateListeners();
 
     if (shouldStart) {
       ipcRenderer.send('start-server');
@@ -50,7 +71,7 @@ const ServerToggle = () => {
   };
 
   return (
-    <EuiFormRow className="mb-4 !mt-0" label={<>Start API Server on port <EuiLink target={'_blank'} href={getURL(serverPort) + serverApiBasePath}>{serverPort}</EuiLink></>} fullWidth>
+    <EuiFormRow className="mb-4 !mt-0" label={<>Start API Server on port <EuiLink target={'_blank'} href={getURL(port) + serverApiBasePath}>{port}</EuiLink></>} fullWidth>
       <SwitchField value={isRunning} onChange={handleToggle} />
     </EuiFormRow>
   );

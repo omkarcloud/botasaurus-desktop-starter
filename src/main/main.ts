@@ -25,6 +25,7 @@ import { Server } from 'botasaurus-server/server';
 import { AppUpdater } from './utils/AppUpdater'
 import { getBotasaurusStorage } from 'botasaurus/botasaurus-storage'
 import { ipcMain } from './utils/ipc-main'
+import { postToast } from './utils/toast'
 
 
 function exitHandler(options) {
@@ -126,9 +127,24 @@ To enable it:
   }
   runApp(onQuit, () => {
     if (API) {
+      const sendServerState = (isRunning: boolean, actualPort: number) => {
+        ipcMain.send('server-state', { isRunning, port: actualPort, apiBasePath: apiBasePath || API.apiBasePath, routeAliases: createRouteAliasesObj(API) })
+      }
+
+      const startServerAndNotify = () => {
+        return Promise.resolve(startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache))
+          .then((actualPort: number) => {
+            sendServerState(true, actualPort)
+            if (actualPort !== finalPORT) {
+              postToast('port-changed', `Port ${finalPORT} is already in use by another application, so the API server is running on port ${actualPort} instead.`)
+            }
+          })
+          .catch((err) => console.error(err))
+      }
+
       ipcMain.on('start-server', () => {
         getBotasaurusStorage().setItem('shouldStartServer', true)
-        startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
+        startServerAndNotify()
       })
 
       ipcMain.on('stop-server', () => {
@@ -138,7 +154,7 @@ To enable it:
         const shouldStartServer = getBotasaurusStorage().getItem('shouldStartServer', API.autoStart)
         ipcMain.send('server-state', { isRunning: shouldStartServer, port: finalPORT,  apiBasePath: apiBasePath || API.apiBasePath, routeAliases:createRouteAliasesObj(API) })
         if (shouldStartServer) {
-          startServer(finalPORT, Server.getScrapersConfig(), apiBasePath || API.apiBasePath, createRouteAliasesObj(API), Server.cache)
+          startServerAndNotify()
       }
 
     }
@@ -208,7 +224,7 @@ async function initDbAndExecutor(onReady) {
       checkMasterHealth()
       // Remove this if your app does not use auto updates
       // eslint-disable-next-line
-      if (!config.isDev && !isWorker && !isMaster) {
+      if (!config.isDevWorkerOrMaster) {
         AppUpdater.init()
       }
   
@@ -222,6 +238,8 @@ function checkMasterHealth() {
     global.checkMasterHealth()
   }
 }
+
+let isCleaningUp = false;
 
 function runApp(onQuit, onWindowMade) {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
@@ -258,15 +276,24 @@ function runApp(onQuit, onWindowMade) {
         // dock icon is clicked and there are no other windows open.
         if (getWindow() === null) createWindow(null, null)
       })
-      app.on('before-quit', async () => {
+      app.on('before-quit', async (event) => {
+        if (isCleaningUp) return;
+        event.preventDefault();
+        isCleaningUp = true;
+
         if (powerSaveId) {
           if (powerSaveBlocker.isStarted(powerSaveId)) {
             powerSaveBlocker.stop(powerSaveId)
           }
         }
 
-        await onClose()
-        await onQuit?.()
+        try {
+          await onClose()
+          await onQuit?.()
+        } catch (error) {
+          console.error('[before-quit] Cleanup error:', error);
+        }
+        app.quit();
       })
     })
     .catch(console.log)
@@ -290,15 +317,23 @@ function runAppWithoutWindow(onQuit, onReady) {
 
       powerSaveId = powerSaveBlocker.start('prevent-app-suspension')
 
-      app.on('before-quit', async () => {
+      app.on('before-quit', async (event) => {
+        if (isCleaningUp) return;
+        event.preventDefault();
+        isCleaningUp = true;
+
         if (powerSaveId) {
           if (powerSaveBlocker.isStarted(powerSaveId)) {
             powerSaveBlocker.stop(powerSaveId)
           }
         }
-        await onClose()
-        await onQuit?.()
-        
+        try {
+          await onClose()
+          await onQuit?.()
+        } catch (error) {
+          console.error('[before-quit] Cleanup error:', error);
+        }
+        app.quit();
       })
     })
     .catch(console.log)
